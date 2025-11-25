@@ -174,4 +174,94 @@ public class SistemaArchivos {
         System.out.println("Archivo \"" + nombreArchivo + "\" eliminado correctamente.");
         return true;
     }
+    
+    /**
+    * "Lee" un archivo dentro de un directorio dado.
+    * En esta simulación, leer significa simplemente
+    * devolver el objeto Archivo si existe.
+    * 
+    * @param rutaDirectorio ruta del directorio
+    * @param nombreArchivo nombre del archivo
+    * @return el Archivo si existe, null si no
+    */
+    public Archivo leerArchivo(String rutaDirectorio, String nombreArchivo) {
+        Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
+        if (dir == null) {
+            System.out.println("Ruta inválida: " + rutaDirectorio);
+            return null;
+        }
+
+        Archivo archivo = dir.buscarArchivo(nombreArchivo);
+        if (archivo == null) {
+            System.out.println("El archivo no existe en ese directorio.");
+            return null;
+        }
+        
+        // Aquí podrías, si quisieras, simular lectura de bloques, etc.
+        return archivo;
+    }
+    
+    /**
+    * Renombra un archivo dentro de un directorio.
+    * 
+    * @param rutaDirectorio ruta del directorio donde está el archivo
+    * @param nombreViejo nombre actual del archivo
+    * @param nombreNuevo nuevo nombre deseado
+    * @return true si se renombró, false si hubo algún problema
+    */
+    public boolean renombrarArchivo(String rutaDirectorio, String nombreViejo, String nombreNuevo) {
+        Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
+        if (dir == null) {
+            System.out.println("Ruta inválida: " + rutaDirectorio);
+            return false;
+        }
+
+        Archivo archivo = dir.buscarArchivo(nombreViejo);
+        if (archivo == null) {
+            System.out.println("El archivo a renombrar no existe.");
+            return false;
+        }
+
+        // Opcional: evitar duplicados con mismo nombre
+        if (dir.buscarArchivo(nombreNuevo) != null) {
+            System.out.println("Ya existe un archivo con el nombre nuevo.");
+            return false;
+        }
+
+        archivo.setNombre(nombreNuevo);
+        return true;
+    }
+
+    /**
+    * Renombra un subdirectorio dentro de un directorio padre.
+    * 
+    * @param rutaPadre ruta del directorio padre (por ejemplo "/Documentos")
+    * @param nombreViejo nombre actual del subdirectorio
+    * @param nombreNuevo nuevo nombre deseado
+    * @return true si se renombró, false en caso contrario
+    */
+    public boolean renombrarDirectorio(String rutaPadre, String nombreViejo, String nombreNuevo) {
+        Directorio padre = obtenerDirectorioDesdeRuta(rutaPadre);
+        if (padre == null) {
+            System.out.println("Ruta padre inválida: " + rutaPadre);
+            return false;
+        }
+
+        Directorio dir = padre.buscarSubdirectorio(nombreViejo);
+        if (dir == null) {
+            System.out.println("El subdirectorio a renombrar no existe.");
+            return false;
+        }
+
+        // Opcional: evitar duplicados
+        if (padre.buscarSubdirectorio(nombreNuevo) != null) {
+            System.out.println("Ya existe un subdirectorio con el nombre nuevo.");
+            return false;
+        }
+
+        dir.setNombre(nombreNuevo);
+        return true;
+    }
+    
+    
 }

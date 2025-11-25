@@ -136,7 +136,7 @@ public class Directorio {
     }
 
 
-    // Getters
+    // Getters y setters
 
     public String getNombre() {
         return nombre;
@@ -152,6 +152,10 @@ public class Directorio {
 
     public Lista<Directorio> getSubdirectorios() {
         return subdirectorios;
+    }
+    
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     @Override
