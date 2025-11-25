@@ -34,8 +34,10 @@ public class Directorio {
         this.subdirectorios = new Lista<>();
     }
 
+    // ==========================
     // Métodos para archivos
- 
+    // ==========================
+
     /**
      * Agrega un archivo a este directorio.
      * 
@@ -47,6 +49,7 @@ public class Directorio {
 
     /**
      * Busca un archivo por nombre dentro de este directorio.
+     * (No busca recursivamente en subdirectorios).
      * 
      * @param nombreArchivo nombre del archivo a buscar
      * @return el Archivo si lo encuentra, null si no existe
@@ -105,11 +108,7 @@ public class Directorio {
 
     // Métodos para subdirectorios
 
-    /**
-     * Agrega un subdirectorio a este directorio.
-     * 
-     * @param dir subdirectorio a agregar
-     */
+    //Agrega un subdirectorio a este directorio.
     public void agregarSubdirectorio(Directorio dir) {
         subdirectorios.insertarAlFinal(dir);
     }
@@ -135,7 +134,47 @@ public class Directorio {
         return null;
     }
 
+    /**
+     * Elimina un subdirectorio por nombre dentro de este directorio.
+     * 
+     * Importante: la eliminación recursiva del contenido se maneja antes
+     * SistemaArchivos, antes de llamar a este método.
+     * 
+     * @param nombreDirectorio nombre del subdirectorio a eliminar
+     * @return true si lo encontró y eliminó, false si no existía
+     */
+    public boolean eliminarSubdirectorio(String nombreDirectorio) {
+        Nodo actual = subdirectorios.getFirst();
+        Nodo anterior = null;
 
+        while (actual != null) {
+            Directorio d = (Directorio) actual.getDato();
+            if (d.getNombre().equals(nombreDirectorio)) {
+                // eliminar el nodo de la lista "a mano"
+                if (anterior == null) {
+                    // estaba de primero
+                    subdirectorios.setFirst(actual.getNext());
+                } else {
+                    anterior.setNext(actual.getNext());
+                }
+
+                // si era el último, actualizar last
+                if (actual == subdirectorios.getLast()) {
+                    subdirectorios.setLast(anterior);
+                }
+
+                // ajustar tamaño
+                int nuevoTamaño = subdirectorios.getTamaño() - 1;
+                subdirectorios.setTamaño(nuevoTamaño);
+                return true;
+            }
+            anterior = actual;
+            actual = actual.getNext();
+        }
+
+        return false;
+    }
+    
     // Getters y setters
 
     public String getNombre() {
@@ -158,6 +197,13 @@ public class Directorio {
         this.nombre = nombre;
     }
 
+    /**
+     * Mecanismo de fiabilidad
+     * 
+     * Sobrescribimos toString para que, cuando un objeto Directorio se muestre
+     * como texto (en la GUI), aparezca únicamente su nombre y no la referencia
+     * de memoria por defecto.
+     */
     @Override
     public String toString() {
         return nombre;
