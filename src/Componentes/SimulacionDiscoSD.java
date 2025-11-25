@@ -6,19 +6,16 @@ package Componentes;
 
 /**
  * Representa la Simulación de un Disco (SD) como un arreglo de bloques.
- * Cada bloque puede estar libre u ocupado.
- *
- * @author luismarianolovera
+ * Cada bloque puede estar libre u ocupado y puede estar enlazado a otro
+ * bloque mediante asignación encadenada.
+ * 
+ * @author Luis MarianoLovera
  */
 public class SimulacionDiscoSD {
     private Bloque[] bloques;
     private int cantidadBloques;
     private int bloquesLibres;
 
-    /**
-     * Crea un disco con una cantidad fija de bloques.
-     * Todos los bloques empiezan libres.
-     */
     public SimulacionDiscoSD(int cantidadBloques) {
         this.cantidadBloques = cantidadBloques;
         this.bloques = new Bloque[cantidadBloques];
@@ -47,6 +44,7 @@ public class SimulacionDiscoSD {
 
     /**
      * Marca un bloque como ocupado si estaba libre.
+     * No modifica el encadenamiento (campo siguiente).
      */
     public void marcarBloqueOcupado(int indice) {
         if (indice < 0 || indice >= cantidadBloques) {
@@ -72,7 +70,7 @@ public class SimulacionDiscoSD {
         }
     }
     
-        /**
+    /**
      * Reserva una cantidad de bloques libres en el SD y los enlaza
      * mediante asignación encadenada.
      * 
@@ -109,9 +107,12 @@ public class SimulacionDiscoSD {
             }
         }
 
-        // Seguridad: si por algún motivo no se reservaron todos
+        /** Seguridad/fiabilidad: si por algún motivo no se logra
+        * reservar la cantidad completa de bloques, se revierte
+        * todo lo que se había hecho para dejar el disco en un
+        * estado consistente (todo o nada).
+        */
         if (reservados < cantidad) {
-            // Deshacer lo hecho
             int actual = primero;
             while (actual != -1) {
                 Bloque b = bloques[actual];
@@ -140,7 +141,7 @@ public class SimulacionDiscoSD {
 
         while (actual != -1) {
             Bloque b = bloques[actual];
-            int siguiente = b.getSiguiente(); // lo guardo antes de romper el enlace
+            int siguiente = b.getSiguiente(); // se guarda antes de romper el enlace
             if (b.isOcupado()) {
                 b.setOcupado(false);
                 b.setSiguiente(-1);
@@ -149,19 +150,5 @@ public class SimulacionDiscoSD {
             actual = siguiente;
         }
     }
-
-    /**
-     * Método de apoyo para ver el estado del disco por consola.
-     */
-    public void imprimirEstadoBloques() {
-        System.out.println("=== Estado de los bloques en SimulacionDiscoSD ===");
-        for (int i = 0; i < cantidadBloques; i++) {
-            Bloque b = bloques[i];
-            String estado = b.isOcupado() ? "OCUPADO" : "LIBRE";
-            int sig = b.getSiguiente();
-            String siguienteTexto = (sig == -1) ? "FIN" : String.valueOf(sig);
-            System.out.println("Bloque " + b.getId() + ": " + estado + " -> Siguiente: " + siguienteTexto);
-        }
-        System.out.println("Bloques libres: " + bloquesLibres + "/" + cantidadBloques);
-    }
+    
 }

@@ -14,10 +14,9 @@ public class ProcesoES {
     private String tipoOperacion;   // "CREAR", "ELIMINAR", "LEER", etc.
     private String rutaArchivo;     // Ej: "/Documentos/SO/Proyecto2.txt"
     private int posicionCabezal;    // posición en el disco (pista)
-    private String estado;          // "nuevo", "listo", "ejecutando", "terminado"
-
-    // Tamaño del archivo en bloques (solo se usa para operaciones CREAR)
+    private String estado;          
     private int tamanoEnBloques;
+    private int tiempoRestanteES;
 
     /**
      * Constructor básico del proceso de E/S.
@@ -28,10 +27,13 @@ public class ProcesoES {
         this.rutaArchivo = rutaArchivo;
         this.posicionCabezal = posicionCabezal;
         this.estado = "nuevo";
-        this.tamanoEnBloques = 0;   // por defecto, si no se usa (ELIMINAR, LEER, etc.)
+        this.tamanoEnBloques = 0;    // por defecto, si no se usa (ELIMINAR, LEER, etc.)
+        this.tiempoRestanteES = 0;   // se fijará cuando vaya a BLOQUEADO
     }
 
-    // Getters y setters
+    // ==========================
+    // Getters y setters básicos
+    // ==========================
 
     public int getIdProceso() {
         return idProceso;
@@ -63,5 +65,13 @@ public class ProcesoES {
 
     public void setTamanoEnBloques(int tamanoEnBloques) {
         this.tamanoEnBloques = tamanoEnBloques;
+    }
+
+    public int getTiempoRestanteES() {
+        return tiempoRestanteES;
+    }
+
+    public void setTiempoRestanteES(int tiempoRestanteES) {
+        this.tiempoRestanteES = tiempoRestanteES;
     }
 }

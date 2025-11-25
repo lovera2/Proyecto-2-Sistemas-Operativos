@@ -8,18 +8,17 @@ package Componentes;
  * Representa el sistema de archivos lógico que se apoya
  * en la Simulación de Disco (SD) para asignar bloques.
  * 
+ * Gestiona la creación, eliminación, lectura y renombrado de
+ * archivos y directorios, apoyándose en la estructura de
+ * Directorio/Archivo y en el disco simulado (SimulacionDiscoSD).
+ * 
  * @author Luis Mariano Lovera
  */
 public class SistemaArchivos {
     
-    private Directorio raiz;            // directorio raíz "/"
-    private SimulacionDiscoSD disco;    // disco simulado
+    private Directorio raiz;            //directorio raíz "/"
+    private SimulacionDiscoSD disco;    //disco simulado
 
-    /**
-     * Crea un sistema de archivos con un disco de cierta cantidad de bloques.
-     * 
-     * @param cantidadBloques número total de bloques del disco simulado
-     */
     public SistemaArchivos(int cantidadBloques) {
         this.disco = new SimulacionDiscoSD(cantidadBloques);
         this.raiz = new Directorio("root", null);
@@ -33,9 +32,7 @@ public class SistemaArchivos {
         return disco;
     }
 
-    // =========================
-    // Navegación por ruta simple
-    // =========================
+    //Navegación por ruta simple
 
     /**
      * Busca un directorio a partir de una ruta simple tipo:
@@ -72,24 +69,17 @@ public class SistemaArchivos {
         return actual;
     }
 
-    // Creacion de directorios
- 
-    /**
-     * Crea un subdirectorio dentro de la ruta dada.
-     * 
-     * @param rutaPadre ruta del directorio padre (Ej: "/", "/Documentos")
-     * @param nombreDirectorio nombre del nuevo directorio
-     * @return true si se creó, false si no (ruta inválida o ya existe)
-     */
+    //Crea un subdirectorio dentro de la ruta dada.
     public boolean crearDirectorio(String rutaPadre, String nombreDirectorio) {
         Directorio padre = obtenerDirectorioDesdeRuta(rutaPadre);
         if (padre == null) {
-            return false; // ruta no existe
+            //ruta padre no existe
+            return false;
         }
 
-        // Evitar duplicados
+        //Evitar duplicados de subdirectorio en el mismo padre
         if (padre.buscarSubdirectorio(nombreDirectorio) != null) {
-            return false; // ya existe un subdirectorio con ese nombre
+            return false;
         }
 
         Directorio nuevo = new Directorio(nombreDirectorio, padre);
@@ -97,7 +87,7 @@ public class SistemaArchivos {
         return true;
     }
 
-    // Creacion de archivos
+    // Creación de archivos
     
     /**
      * Crea un archivo dentro de un directorio dado,
@@ -111,20 +101,26 @@ public class SistemaArchivos {
     public Archivo crearArchivo(String rutaDirectorio, String nombreArchivo, int tamañoEnBloques) {
         Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
         if (dir == null) {
-            System.out.println("Ruta inválida: " + rutaDirectorio);
+            // ruta inválida
+            return null;
+        }
+
+        // Evitar duplicados de archivo en el mismo directorio
+        if (dir.buscarArchivo(nombreArchivo) != null) {
+            // ya existe archivo con ese nombre
             return null;
         }
 
         // ¿Hay espacio suficiente en el disco?
         if (tamañoEnBloques > disco.getBloquesLibres()) {
-            System.out.println("No hay suficientes bloques libres en el disco.");
+            // no hay suficientes bloques libres
             return null;
         }
 
         // Reservar bloques en el SD (asignación encadenada)
         int primerBloque = disco.reservarBloques(tamañoEnBloques);
         if (primerBloque == -1) {
-            System.out.println("No se pudo reservar la cadena de bloques.");
+            // no se pudo reservar la cadena de bloques
             return null;
         }
 
@@ -147,14 +143,12 @@ public class SistemaArchivos {
         // 1. Buscar el directorio
         Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
         if (dir == null) {
-            System.out.println("Ruta inválida: " + rutaDirectorio);
             return false;
         }
 
         // 2. Buscar el archivo dentro de ese directorio
         Archivo archivo = dir.buscarArchivo(nombreArchivo);
         if (archivo == null) {
-            System.out.println("El archivo no existe en ese directorio.");
             return false;
         }
 
@@ -167,18 +161,15 @@ public class SistemaArchivos {
         // 4. Eliminar el archivo de la lista del directorio
         boolean eliminado = dir.eliminarArchivo(nombreArchivo);
         if (!eliminado) {
-            System.out.println("No se pudo eliminar el archivo de la lista del directorio.");
             return false;
         }
 
-        System.out.println("Archivo \"" + nombreArchivo + "\" eliminado correctamente.");
         return true;
     }
     
     /**
     * "Lee" un archivo dentro de un directorio dado.
-    * En esta simulación, leer significa simplemente
-    * devolver el objeto Archivo si existe.
+    * En esta simulación, leer significa simplemente devolver el objeto Archivo si existe.
     * 
     * @param rutaDirectorio ruta del directorio
     * @param nombreArchivo nombre del archivo
@@ -187,17 +178,13 @@ public class SistemaArchivos {
     public Archivo leerArchivo(String rutaDirectorio, String nombreArchivo) {
         Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
         if (dir == null) {
-            System.out.println("Ruta inválida: " + rutaDirectorio);
             return null;
         }
 
         Archivo archivo = dir.buscarArchivo(nombreArchivo);
         if (archivo == null) {
-            System.out.println("El archivo no existe en ese directorio.");
             return null;
         }
-        
-        // Aquí podrías, si quisieras, simular lectura de bloques, etc.
         return archivo;
     }
     
@@ -212,19 +199,16 @@ public class SistemaArchivos {
     public boolean renombrarArchivo(String rutaDirectorio, String nombreViejo, String nombreNuevo) {
         Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
         if (dir == null) {
-            System.out.println("Ruta inválida: " + rutaDirectorio);
             return false;
         }
 
         Archivo archivo = dir.buscarArchivo(nombreViejo);
         if (archivo == null) {
-            System.out.println("El archivo a renombrar no existe.");
             return false;
         }
 
-        // Opcional: evitar duplicados con mismo nombre
+        // Evitar duplicados con mismo nombre
         if (dir.buscarArchivo(nombreNuevo) != null) {
-            System.out.println("Ya existe un archivo con el nombre nuevo.");
             return false;
         }
 
@@ -243,25 +227,103 @@ public class SistemaArchivos {
     public boolean renombrarDirectorio(String rutaPadre, String nombreViejo, String nombreNuevo) {
         Directorio padre = obtenerDirectorioDesdeRuta(rutaPadre);
         if (padre == null) {
-            System.out.println("Ruta padre inválida: " + rutaPadre);
             return false;
         }
 
         Directorio dir = padre.buscarSubdirectorio(nombreViejo);
         if (dir == null) {
-            System.out.println("El subdirectorio a renombrar no existe.");
             return false;
         }
 
-        // Opcional: evitar duplicados
+        // Evitar duplicados
         if (padre.buscarSubdirectorio(nombreNuevo) != null) {
-            System.out.println("Ya existe un subdirectorio con el nombre nuevo.");
             return false;
         }
 
         dir.setNombre(nombreNuevo);
         return true;
     }
-    
-    
+
+
+    /**
+     * Elimina un directorio completoapartir de su ruta.
+     * 
+     * El proceso es:
+     *  1. Buscar el directorio a eliminar usando la ruta.
+     *  2. No permitir eliminar la raíz.
+     *  3. Eliminar recursivamente todos los archivos y subdirectorios que contiene,
+     *     liberando los bloques de cada archivo en el disco simulado.
+     *  4. Finalmente, pedirle al directorio padre que lo elimine de su lista
+     *     de subdirectorios (usando eliminarSubdirectorio).
+     * 
+     * @param rutaDirectorio ruta del directorio a eliminar (por ejemplo "/Documentos/SO")
+     * @return true si se eliminó correctamente, false si hubo algún problema
+     */
+    public boolean eliminarDirectorio(String rutaDirectorio) {
+        // No permitir eliminar la raíz
+        if (rutaDirectorio == null || rutaDirectorio.equals("/") || rutaDirectorio.equals("")) {
+            return false;
+        }
+
+        Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
+        if (dir == null) {
+            return false;
+        }
+
+        Directorio padre = dir.getPadre();
+        if (padre == null) {
+            // por seguridad extra: si no tiene padre, lo consideramos raíz
+            return false;
+        }
+
+        // 1. Eliminar recursivamente todo el contenido (archivos y subdirectorios)
+        eliminarContenidoDirectorio(dir);
+
+        // 2. Desenganchar el directorio del padre
+        boolean eliminado = padre.eliminarSubdirectorio(dir.getNombre());
+        if (!eliminado) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Elimina recursivamente todos los archivos y subdirectorios dentro de un directorio.
+     * 
+     * Para cada archivo:
+     *  - Libera la cadena de bloques en el disco.
+     *  - Lo elimina de la lista del directorio.
+     * 
+     * Para cada subdirectorio:
+     *  - Llama recursivamente a este método para vaciarlo.
+     *  - Luego, lo desengancha de la lista del directorio actual.
+     * 
+     * Importante: este método NO elimina al directorio actual de su padre,
+     * solo vacía su contenido. El desenganche del propio directorio se hace
+     * en eliminarDirectorio().
+     * 
+     * @param dir directorio cuyo contenido será eliminado
+     */
+    private void eliminarContenidoDirectorio(Directorio dir) {
+        // 1. Eliminar todos los archivos de este directorio
+        while (dir.getArchivos().getFirst() != null) {
+            // Tomar siempre el primer archivo de la lista
+            Archivo archivo = (Archivo) dir.getArchivos().getFirst().getDato();
+            int primerBloque = archivo.getPrimerBloque();
+            if (primerBloque != -1) {
+                disco.liberarCadenaBloques(primerBloque);
+            }
+            dir.eliminarArchivo(archivo.getNombre());
+        }
+
+        // 2. Eliminar recursivamente todos los subdirectorios
+        while (dir.getSubdirectorios().getFirst() != null) {
+            Directorio subdir = (Directorio) dir.getSubdirectorios().getFirst().getDato();
+            // Vaciar el contenido del subdirectorio
+            eliminarContenidoDirectorio(subdir);
+            // Desenganchar el subdirectorio de la lista del directorio actual
+            dir.eliminarSubdirectorio(subdir.getNombre());
+        }
+    }
 }

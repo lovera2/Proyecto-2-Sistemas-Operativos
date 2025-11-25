@@ -14,7 +14,7 @@ package Componentes;
 public class Bloque {
     private int id;
     private boolean ocupado;
-    private int siguiente; // -1 si no hay siguiente bloque
+    private int siguiente; //-1 si no hay siguiente bloque
 
     public Bloque(int id) {
         this.id = id;

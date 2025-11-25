@@ -9,54 +9,33 @@ import Estructuras.Cola;
 /**
  * Planificador de disco general.
  *
- * Mantiene la cola de procesos de E/S y decide el orden
- * en que se atienden las solicitudes según la política
- * seleccionada (FIFO, SSTF, SCAN, CSCAN).
+ * NO guarda una cola interna; trabaja sobre la cola de procesos LISTOS
+ * que le pasa el GestorProcesosES.
  *
- * Además, lleva estadísticas simples sobre:
- *  - cuántas solicitudes llegaron,
- *  - cuántas se atendieron,
- *  - movimiento total del cabezal,
- *  - cuántas solicitudes CREAR / ELIMINAR / LEER.
+ * Decide el orden en que se atienden las solicitudes según la política
+ * seleccionada (FIFO, SSTF, SCAN, CSCAN) y lleva estadísticas simples
+ * de movimiento del cabezal.
  */
 public class Planificador {
 
-    private Cola<ProcesoES> colaES;     // cola de solicitudes de E/S
     private String politicaActual;      // "FIFO", "SSTF", "SCAN", "CSCAN"
 
     // Para simular el movimiento del cabezal
     private int posicionActualCabezal;
     private int movimientoTotal;        // movimiento acumulado del cabezal
 
-    // Para numerar los procesos de forma sencilla
-    private int siguienteId;
-
     // Para SCAN necesitamos saber si el cabezal va hacia arriba o hacia abajo
     private boolean direccionAscendenteSCAN;
 
-    // ==========================
-    // Campos de ESTADÍSTICAS
-    // ==========================
-    private int totalSolicitudesRecibidas;
+    // Estadísticas sencillas
     private int totalSolicitudesAtendidas;
 
-    private int totalCrear;
-    private int totalEliminar;
-    private int totalLeer;
-
     public Planificador() {
-        colaES = new Cola<ProcesoES>();
         politicaActual = "FIFO";    // por defecto
         posicionActualCabezal = 0;  // cabezal inicia en pista 0
         movimientoTotal = 0;
-        siguienteId = 1;
         direccionAscendenteSCAN = true; // SCAN empieza subiendo
-
-        totalSolicitudesRecibidas = 0;
         totalSolicitudesAtendidas = 0;
-        totalCrear = 0;
-        totalEliminar = 0;
-        totalLeer = 0;
     }
 
     // ==========================
@@ -97,101 +76,39 @@ public class Planificador {
     }
 
     // ==========================
-    // Manejo de solicitudes
+    // Selección del siguiente proceso
     // ==========================
 
     /**
-     * Agrega una nueva solicitud de E/S a la cola.
-     * Crea un ProcesoES con un id, tipo de operación, ruta y posición.
-     */
-    public void agregarSolicitud(String tipoOperacion, String rutaArchivo, int posicionCabezal) {
-        ProcesoES p = new ProcesoES(siguienteId, tipoOperacion, rutaArchivo, posicionCabezal);
-        siguienteId = siguienteId + 1;
-
-        // Cuando entra a la cola lo marcamos como "listo"
-        p.setEstado("listo");
-        colaES.encolar(p);
-
-        // Actualizar estadísticas
-        totalSolicitudesRecibidas = totalSolicitudesRecibidas + 1;
-        if (tipoOperacion.equals("CREAR")) {
-            totalCrear = totalCrear + 1;
-        } else if (tipoOperacion.equals("ELIMINAR")) {
-            totalEliminar = totalEliminar + 1;
-        } else if (tipoOperacion.equals("LEER")) {
-            totalLeer = totalLeer + 1;
-        }
-    }
-
-    /**
-     * Agrega una solicitud de tipo CREAR con tamaño en bloques.
-     */
-    public void agregarSolicitudCrear(String rutaArchivo, int posicionCabezal, int tamanoBloques) {
-        ProcesoES p = new ProcesoES(siguienteId, "CREAR", rutaArchivo, posicionCabezal);
-        siguienteId = siguienteId + 1;
-
-        p.setEstado("listo");
-        p.setTamanoEnBloques(tamanoBloques);
-
-        colaES.encolar(p);
-
-        // Actualizar estadísticas
-        totalSolicitudesRecibidas = totalSolicitudesRecibidas + 1;
-        totalCrear = totalCrear + 1;
-    }
-
-    /**
-     * Indica si hay solicitudes pendientes en la cola de E/S.
-     */
-    public boolean haySolicitudesPendientes() {
-        return !colaES.esVacia();
-    }
-
-    /**
-     * Devuelve cuántos procesos hay en la cola (para mostrar en la interfaz).
-     */
-    public int getCantidadEnCola() {
-        return colaES.verTamano();
-    }
-
-    /**
-     * Devuelve el proceso en la posición i de la cola sin sacarlo.
-     * Útil para mostrar la cola en la interfaz (tabla, lista, etc.).
-     */
-    public ProcesoES getProcesoEnPosicion(int i) {
-        return colaES.getAt(i);
-    }
-
-    // ==========================
-    // Obtener siguiente proceso
-    // ==========================
-
-    /**
-     * Obtiene el siguiente proceso según la política actual.
+     * Obtiene el siguiente proceso según la política actual, trabajando
+     * sobre la cola de LISTOS que le pasa el GestorProcesosES.
      *
-     * - FIFO: primero en entrar, primero en salir.
-     * - SSTF: proceso con pista más cercana al cabezal actual.
-     * - SCAN: "ascensor".
-     * - CSCAN: "circular".
+     * IMPORTANTE:
+     *  - Este método SACA el proceso de la cola (usa desencolar/removeAt).
+     *  - Cambia el estado del proceso a "ejecutando".
+     *  - Actualiza el movimiento del cabezal y las estadísticas.
+     *
+     * @param colaListos cola de procesos en estado LISTO
+     * @return ProcesoES seleccionado o null si no hay listos
      */
-    public ProcesoES obtenerSiguienteProceso() {
-        if (colaES.esVacia()) {
+    public ProcesoES obtenerSiguienteProceso(Cola<ProcesoES> colaListos) {
+        if (colaListos == null || colaListos.esVacia()) {
             return null;
         }
 
         ProcesoES p = null;
 
         if (politicaActual.equals("FIFO")) {
-            p = siguienteFIFO();
+            p = siguienteFIFO(colaListos);
         } else if (politicaActual.equals("SSTF")) {
-            p = siguienteSSTF();
+            p = siguienteSSTF(colaListos);
         } else if (politicaActual.equals("SCAN")) {
-            p = siguienteSCAN();
+            p = siguienteSCAN(colaListos);
         } else if (politicaActual.equals("CSCAN")) {
-            p = siguienteCSCAN();
+            p = siguienteCSCAN(colaListos);
         } else {
             // Por si acaso la política es inválida, usamos FIFO
-            p = siguienteFIFO();
+            p = siguienteFIFO(colaListos);
         }
 
         if (p != null) {
@@ -211,15 +128,13 @@ public class Planificador {
         return p;
     }
 
-    // =====================================================
-    // Métodos privados para cada política de planificación
-    // =====================================================
+    //Politicas de planificacion
 
     /**
      * FIFO: toma el primer proceso de la cola.
      */
-    private ProcesoES siguienteFIFO() {
-        return colaES.desencolar();
+    private ProcesoES siguienteFIFO(Cola<ProcesoES> cola) {
+        return cola.desencolar();
     }
 
     /**
@@ -227,18 +142,18 @@ public class Planificador {
      * Busca el proceso cuya posición de pista esté más cerca
      * de la posición actual del cabezal.
      */
-    private ProcesoES siguienteSSTF() {
-        int n = colaES.verTamano();
+    private ProcesoES siguienteSSTF(Cola<ProcesoES> cola) {
+        int n = cola.verTamano();
         if (n == 0) {
             return null;
         }
 
         int mejorIndice = 0;
-        ProcesoES mejorProceso = colaES.getAt(0);
+        ProcesoES mejorProceso = cola.getAt(0);
         int mejorDistancia = Math.abs(mejorProceso.getPosicionCabezal() - posicionActualCabezal);
 
         for (int i = 1; i < n; i++) {
-            ProcesoES candidato = colaES.getAt(i);
+            ProcesoES candidato = cola.getAt(i);
             int distancia = Math.abs(candidato.getPosicionCabezal() - posicionActualCabezal);
             if (distancia < mejorDistancia) {
                 mejorDistancia = distancia;
@@ -247,14 +162,14 @@ public class Planificador {
             }
         }
 
-        return colaES.removeAt(mejorIndice);
+        return cola.removeAt(mejorIndice);
     }
 
     /**
      * SCAN ("ascensor").
      */
-    private ProcesoES siguienteSCAN() {
-        int n = colaES.verTamano();
+    private ProcesoES siguienteSCAN(Cola<ProcesoES> cola) {
+        int n = cola.verTamano();
         if (n == 0) {
             return null;
         }
@@ -265,7 +180,7 @@ public class Planificador {
         if (direccionAscendenteSCAN) {
             // Buscar procesos hacia arriba (pos >= cabezalActual)
             for (int i = 0; i < n; i++) {
-                ProcesoES p = colaES.getAt(i);
+                ProcesoES p = cola.getAt(i);
                 int pos = p.getPosicionCabezal();
                 if (pos >= posicionActualCabezal) {
                     if (mejorIndice == -1 || pos < mejorProceso.getPosicionCabezal()) {
@@ -279,7 +194,7 @@ public class Planificador {
             if (mejorIndice == -1) {
                 direccionAscendenteSCAN = false; // ahora bajamos
                 for (int i = 0; i < n; i++) {
-                    ProcesoES p = colaES.getAt(i);
+                    ProcesoES p = cola.getAt(i);
                     int pos = p.getPosicionCabezal();
                     if (pos <= posicionActualCabezal) {
                         if (mejorIndice == -1 || pos > mejorProceso.getPosicionCabezal()) {
@@ -292,7 +207,7 @@ public class Planificador {
         } else {
             // Direccion descendente: buscar procesos hacia abajo (pos <= cabezalActual)
             for (int i = 0; i < n; i++) {
-                ProcesoES p = colaES.getAt(i);
+                ProcesoES p = cola.getAt(i);
                 int pos = p.getPosicionCabezal();
                 if (pos <= posicionActualCabezal) {
                     if (mejorIndice == -1 || pos > mejorProceso.getPosicionCabezal()) {
@@ -306,7 +221,7 @@ public class Planificador {
             if (mejorIndice == -1) {
                 direccionAscendenteSCAN = true; // ahora subimos
                 for (int i = 0; i < n; i++) {
-                    ProcesoES p = colaES.getAt(i);
+                    ProcesoES p = cola.getAt(i);
                     int pos = p.getPosicionCabezal();
                     if (pos >= posicionActualCabezal) {
                         if (mejorIndice == -1 || pos < mejorProceso.getPosicionCabezal()) {
@@ -320,17 +235,17 @@ public class Planificador {
 
         if (mejorIndice == -1) {
             // Por seguridad, si algo raro pasa, usamos FIFO
-            return colaES.desencolar();
+            return cola.desencolar();
         }
 
-        return colaES.removeAt(mejorIndice);
+        return cola.removeAt(mejorIndice);
     }
 
     /**
      * C-SCAN (Circular SCAN).
      */
-    private ProcesoES siguienteCSCAN() {
-        int n = colaES.verTamano();
+    private ProcesoES siguienteCSCAN(Cola<ProcesoES> cola) {
+        int n = cola.verTamano();
         if (n == 0) {
             return null;
         }
@@ -340,7 +255,7 @@ public class Planificador {
 
         // Primero buscar posiciones >= cabezalActual
         for (int i = 0; i < n; i++) {
-            ProcesoES p = colaES.getAt(i);
+            ProcesoES p = cola.getAt(i);
             int pos = p.getPosicionCabezal();
             if (pos >= posicionActualCabezal) {
                 if (mejorIndice == -1 || pos < mejorProceso.getPosicionCabezal()) {
@@ -353,7 +268,7 @@ public class Planificador {
         // Si no hay procesos hacia arriba, "saltamos" y tomamos el de menor posición global
         if (mejorIndice == -1) {
             for (int i = 0; i < n; i++) {
-                ProcesoES p = colaES.getAt(i);
+                ProcesoES p = cola.getAt(i);
                 int pos = p.getPosicionCabezal();
                 if (mejorIndice == -1 || pos < mejorProceso.getPosicionCabezal()) {
                     mejorIndice = i;
@@ -362,37 +277,17 @@ public class Planificador {
             }
         }
 
-        return colaES.removeAt(mejorIndice);
+        return cola.removeAt(mejorIndice);
     }
 
-    // ==========================
-    // Getters de ESTADÍSTICAS
-    // ==========================
-
-    public int getTotalSolicitudesRecibidas() {
-        return totalSolicitudesRecibidas;
-    }
+    // Getters para estadisticas
+  
 
     public int getTotalSolicitudesAtendidas() {
         return totalSolicitudesAtendidas;
     }
 
-    public int getTotalCrear() {
-        return totalCrear;
-    }
-
-    public int getTotalEliminar() {
-        return totalEliminar;
-    }
-
-    public int getTotalLeer() {
-        return totalLeer;
-    }
-
-    /**
-     * Devuelve el promedio de movimiento del cabezal por solicitud atendida.
-     * Si todavía no se ha atendido ninguna, devuelve 0.
-     */
+    // Devuelve el promedio de movimiento del cabezal por solicitud atendida. Si todavía no se ha atendido ninguna, devuelve 0.
     public double getPromedioMovimientoPorSolicitud() {
         if (totalSolicitudesAtendidas == 0) {
             return 0.0;
@@ -400,16 +295,9 @@ public class Planificador {
         return (double) movimientoTotal / (double) totalSolicitudesAtendidas;
     }
 
-    /**
-     * Reinicia las estadísticas (por si el usuario quiere "limpiar" los datos).
-     * NO borra la cola, solo los contadores.
-     */
+    //Reinicia las estadísticas (por si el usuario quiere "limpiar" los datos).
     public void reiniciarEstadisticas() {
-        totalSolicitudesRecibidas = 0;
         totalSolicitudesAtendidas = 0;
-        totalCrear = 0;
-        totalEliminar = 0;
-        totalLeer = 0;
         movimientoTotal = 0;
     }
 }
