@@ -9,7 +9,6 @@ package Estructuras;
  * Permite las operaciones básicas de encolar, desencolar y verificación de estado.
  * 
  * @param <T> Tipo genérico de los elementos almacenados en la cola
- * @author Luis Mariano Lovera
  */
 public class Cola<T> {
     private Nodo<T> front;
