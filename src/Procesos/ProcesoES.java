@@ -11,17 +11,24 @@ package Procesos;
 public class ProcesoES {
     
     private int idProceso;
-    private String tipoOperacion;  // "CREAR", "ELIMINAR", "LEER", etc.
-    private String rutaArchivo;    // Ej: "/Documentos/SO/Proyecto2.txt"
-    private int posicionCabezal;  // posición en el disco (para las políticas)
-    private String estado;        // "nuevo", "listo", "ejecutando", "terminado"
+    private String tipoOperacion;   // "CREAR", "ELIMINAR", "LEER", etc.
+    private String rutaArchivo;     // Ej: "/Documentos/SO/Proyecto2.txt"
+    private int posicionCabezal;    // posición en el disco (pista)
+    private String estado;          // "nuevo", "listo", "ejecutando", "terminado"
 
+    // Tamaño del archivo en bloques (solo se usa para operaciones CREAR)
+    private int tamanoEnBloques;
+
+    /**
+     * Constructor básico del proceso de E/S.
+     */
     public ProcesoES(int idProceso, String tipoOperacion, String rutaArchivo, int posicionCabezal) {
         this.idProceso = idProceso;
         this.tipoOperacion = tipoOperacion;
         this.rutaArchivo = rutaArchivo;
         this.posicionCabezal = posicionCabezal;
         this.estado = "nuevo";
+        this.tamanoEnBloques = 0;   // por defecto, si no se usa (ELIMINAR, LEER, etc.)
     }
 
     // Getters y setters
@@ -48,5 +55,13 @@ public class ProcesoES {
 
     public void setEstado(String nuevoEstado) {
         this.estado = nuevoEstado;
+    }
+
+    public int getTamanoEnBloques() {
+        return tamanoEnBloques;
+    }
+
+    public void setTamanoEnBloques(int tamanoEnBloques) {
+        this.tamanoEnBloques = tamanoEnBloques;
     }
 }
