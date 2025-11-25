@@ -5,6 +5,15 @@
         <group>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Estructuras/Nodo.java</file>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Estructuras/Cola.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Estructuras/Lista.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/Bloque.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/SimulacionDiscoSD.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/Archivo.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/Directorio.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/SistemaArchivos.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/ProcesoES.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/PruebaPlanificadorFIFO.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/PlanificadorDiscoFIFO.java</file>
         </group>
     </open-files>
 </project-private>
