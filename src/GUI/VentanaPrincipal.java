@@ -442,16 +442,19 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
     
     private void ejecutarTickSimulacion() {
-        gestorProcesoES.admitirNuevosAListos(); // NUEVOS -> LISTOS
-        gestorProcesoES.tickEjecucion();        // EJECUCIÓN -> BLOQUEADOS
-        gestorProcesoES.tickBloqueados();       // BLOQUEADOS -> TERMINADOS (+ disco)
-        gestorProcesoES.despacharSiguiente();   // LISTOS -> EJECUCIÓN
+        gestorProcesoES.admitirNuevosAListos();
+        gestorProcesoES.tickEjecucion();
+        gestorProcesoES.tickBloqueados();
+        gestorProcesoES.despacharSiguiente();
 
-    // luego refrescas TODAS las tablas:
-        actualizarTablasProcesos();             // nuevos, listos, ejec, bloq, term
+        actualizarTablasProcesos();
         refrescarDiscoVisual();
         refrescarTablaAsignacion();
-        //refrescarArbol();
+
+        if (gestorProcesoES.isHuboCambioSistemaArchivos()) {
+            refrescarArbol();
+            gestorProcesoES.limpiarCambioSistemaArchivos();
+        }
     }
 
     // Habilita / deshabilita el tamaño según el tipo seleccionado
@@ -1457,7 +1460,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         }
 
         // actualizar vista
-        actualizarTablaProcesos();
+        actualizarTablasProcesos();
         refrescarArbol();
         refrescarTablaAsignacion();
         refrescarProcesosYDisco();

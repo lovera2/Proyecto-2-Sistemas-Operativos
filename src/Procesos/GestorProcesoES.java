@@ -30,6 +30,9 @@ public class GestorProcesoES {
     // contador simple de ids
     private int siguienteId = 1;
 
+    // Flag para avisar a la GUI que cambió algo en el sistema de archivos
+    private boolean huboCambioSistemaArchivos = false;
+
     public GestorProcesoES(Planificador planificador, GestorDisco gestorDisco) {
         this.colaNuevos     = new Cola<>();
         this.colaListos     = new Cola<>();
@@ -45,6 +48,14 @@ public class GestorProcesoES {
         return planificador;
     }
 
+    public boolean isHuboCambioSistemaArchivos() {
+        return huboCambioSistemaArchivos;
+    }
+
+    public void limpiarCambioSistemaArchivos() {
+        this.huboCambioSistemaArchivos = false;
+    }
+
     // =========================================================
     //               CREACIÓN / ADMISIÓN
     // =========================================================
@@ -57,7 +68,7 @@ public class GestorProcesoES {
 
     /** Proceso CREAR: se crea en NUEVOS. */
     public void crearProcesoCrear(String ruta, int pista, int tamBloques) {
-        int pistaLogica = calcularPistaDesdeRuta(ruta);   // <<< usa la ruta
+        int pistaLogica = calcularPistaDesdeRuta(ruta);   // se ignora "pista" y se calcula por ruta
         ProcesoES p = new ProcesoES(generarId(), "CREAR", ruta, pistaLogica);
         p.setEstado("nuevo");
         p.setTamanoEnBloques(tamBloques);
@@ -66,7 +77,7 @@ public class GestorProcesoES {
             mutexColas.acquire();
             colaNuevos.encolar(p);
         } catch (InterruptedException e) {
-            // puedes loggear si quieres
+            // opcional: loggear
         } finally {
             mutexColas.release();
         }
@@ -185,6 +196,7 @@ public class GestorProcesoES {
         try {
             mutexColas.acquire();
 
+            // Solo un proceso de E/S en ejecución (un solo disco)
             if (colaEjecucion.verTamano() > 0) {
                 return null;
             }
@@ -220,6 +232,7 @@ public class GestorProcesoES {
                     p.setTiempoRestanteES(t);
 
                     if (t <= 0) {
+                        // pasa a BLOQUEADO (esperando disco)
                         colaEjecucion.removeAt(i);
                         n--;
 
@@ -242,6 +255,7 @@ public class GestorProcesoES {
     private int calcularTiempoES(ProcesoES p) {
         String tipo = p.getTipoOperacion();
 
+        // renombrar: costo pequeño
         if (tipo != null && tipo.startsWith("RENOMBRAR")) {
             return 2; // 2 ticks
         }
@@ -266,6 +280,7 @@ public class GestorProcesoES {
                     p.setTiempoRestanteES(t);
 
                     if (t <= 0) {
+                        // Termina su E/S
                         colaBloqueados.removeAt(i);
                         n--;
 
@@ -285,7 +300,7 @@ public class GestorProcesoES {
             mutexColas.release();
         }
     }
-
+    
     private void ejecutarOperacionReal(ProcesoES p) {
         if (gestorDisco == null || p == null) return;
 
@@ -310,20 +325,24 @@ public class GestorProcesoES {
             int tam = p.getTamanoEnBloques();
             gestorDisco.getSistemaArchivos()
                        .crearArchivo(rutaDirectorio, nombreArchivo, tam);
+            huboCambioSistemaArchivos = true;
 
         } else if ("ELIMINAR".equals(tipo)) {
             gestorDisco.getSistemaArchivos()
                        .eliminarArchivo(rutaDirectorio, nombreArchivo);
+            huboCambioSistemaArchivos = true;
 
         } else if ("LEER".equals(tipo)) {
             gestorDisco.getSistemaArchivos()
                        .leerArchivo(rutaDirectorio, nombreArchivo);
+            // leer NO modifica el árbol → no marcamos cambio
 
         } else if ("RENOMBRAR_ARCHIVO".equals(tipo)) {
             String nuevoNombre = p.getNuevoNombre();
             if (nuevoNombre != null && !nuevoNombre.isEmpty()) {
                 gestorDisco.getSistemaArchivos()
                            .renombrarArchivo(rutaDirectorio, nombreArchivo, nuevoNombre);
+                huboCambioSistemaArchivos = true;
             }
 
         } else if ("RENOMBRAR_DIRECTORIO".equals(tipo)) {
@@ -331,6 +350,7 @@ public class GestorProcesoES {
             if (nuevoNombre != null && !nuevoNombre.isEmpty()) {
                 gestorDisco.getSistemaArchivos()
                            .renombrarDirectorio(rutaDirectorio, nombreArchivo, nuevoNombre);
+                huboCambioSistemaArchivos = true;
             }
         }
     }
@@ -404,7 +424,7 @@ public class GestorProcesoES {
                 data[i][2] = p.getRutaArchivo();
                 data[i][3] = p.getEstado();
                 data[i][4] = p.getTiempoRestanteES();
-                data[i][5] = p.getPista();
+                data[i][5] = p.getPista();   // pista lógica para política de disco
             }
             i++;
         }
