@@ -571,6 +571,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         lblSeleccionadoActual = new javax.swing.JLabel();
         btnLeerSeleccion = new javax.swing.JButton();
         btnRenombrarSeleccion = new javax.swing.JButton();
+        jLabel14 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jLabel9 = new javax.swing.JLabel();
         rbUsuario = new javax.swing.JRadioButton();
@@ -615,6 +617,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         panelTablaProcesos13 = new javax.swing.JPanel();
         tablaProcesos13 = new javax.swing.JScrollPane();
         jTableTerminados = new javax.swing.JTable();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel12 = new javax.swing.JLabel();
+        jLabel13 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 255));
@@ -623,7 +628,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jPanel1.setLayout(new java.awt.BorderLayout());
         getContentPane().add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 180, -1, -1));
 
-        panelTablaAsignacion.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Tabla de asignación de archivos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelTablaAsignacion.setBackground(new java.awt.Color(204, 255, 255));
+        panelTablaAsignacion.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 102)), "Tabla de asignación de archivos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         tablaAsignacion.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -668,13 +674,14 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             panelTablaAsignacionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTablaAsignacionLayout.createSequentialGroup()
                 .addGap(14, 14, 14)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 193, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 207, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(15, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelTablaAsignacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 650, 400, 250));
+        getContentPane().add(panelTablaAsignacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 650, 400, 260));
 
-        panelCrear.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Crear elemento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelCrear.setBackground(new java.awt.Color(204, 204, 255));
+        panelCrear.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 204)), "Crear elemento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jLabel4.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
         jLabel4.setText("Tipo de objeto:");
@@ -744,14 +751,15 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addGroup(panelCrearLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(spinTamanoBloques, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel6))
-                .addGap(21, 21, 21)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnCrear)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(14, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelCrear, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 190, 360, 180));
+        getContentPane().add(panelCrear, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 360, 180));
 
-        panelOperarSeleccion.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Interactuar con elemento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelOperarSeleccion.setBackground(new java.awt.Color(204, 204, 255));
+        panelOperarSeleccion.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(51, 0, 204)), "Interactuar con elemento", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jLabel7.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
         jLabel7.setText("Elemento seleccionado:");
@@ -783,6 +791,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             }
         });
 
+        jLabel14.setFont(new java.awt.Font("Helvetica Neue", 2, 13)); // NOI18N
+        jLabel14.setText("Seleccione un elemento en el árbol, para proceder:");
+
+        jLabel11.setFont(new java.awt.Font("Helvetica Neue", 2, 13)); // NOI18N
+        jLabel11.setText("Renombrar elemento:");
+
         javax.swing.GroupLayout panelOperarSeleccionLayout = new javax.swing.GroupLayout(panelOperarSeleccion);
         panelOperarSeleccion.setLayout(panelOperarSeleccionLayout);
         panelOperarSeleccionLayout.setHorizontalGroup(
@@ -796,46 +810,61 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                             .addGap(21, 21, 21)
                             .addComponent(lblSeleccionadoActual, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
-                            .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
-                                    .addGap(0, 0, Short.MAX_VALUE)
-                                    .addComponent(jLabel8))
+                                    .addGap(21, 21, 21)
+                                    .addComponent(btnLeerSeleccion)
+                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelOperarSeleccionLayout.createSequentialGroup()
+                                    .addContainerGap()
+                                    .addComponent(jLabel8)
+                                    .addGap(15, 15, 15)))
+                            .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                 .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
-                                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(btnLeerSeleccion)))
-                            .addGap(31, 31, 31)
-                            .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(btnEliminarSeleccion, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(txtNuevoNombre))
-                            .addGap(28, 28, 28)))
+                                    .addGap(12, 12, 12)
+                                    .addComponent(btnEliminarSeleccion))
+                                .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
+                                    .addGap(11, 11, 11)
+                                    .addComponent(txtNuevoNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGap(43, 43, 43)))
                     .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
                         .addGap(96, 96, 96)
-                        .addComponent(btnRenombrarSeleccion)))
+                        .addComponent(btnRenombrarSeleccion))
+                    .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel11, javax.swing.GroupLayout.PREFERRED_SIZE, 329, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel14))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelOperarSeleccionLayout.setVerticalGroup(
             panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelOperarSeleccionLayout.createSequentialGroup()
-                .addGap(12, 12, 12)
-                .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel7)
-                    .addComponent(lblSeleccionadoActual))
-                .addGap(18, 18, 18)
+                .addGap(5, 5, 5)
+                .addComponent(jLabel14)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblSeleccionadoActual)
+                    .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnEliminarSeleccion)
                     .addComponent(btnLeerSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(19, 19, 19)
+                .addGap(8, 8, 8)
+                .addComponent(jLabel11)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(panelOperarSeleccionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(txtNuevoNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnRenombrarSeleccion, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(13, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelOperarSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 400, -1, 190));
+        getContentPane().add(panelOperarSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 400, 360, 210));
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Modo de uso", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        jPanel2.setBackground(new java.awt.Color(204, 204, 255));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 204)), "Modo de uso", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jLabel9.setFont(new java.awt.Font("Helvetica Neue", 1, 13)); // NOI18N
         jLabel9.setText("Seleccione un modo de uso:");
@@ -865,9 +894,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                     .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 195, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(rbUsuario)
-                        .addGap(66, 66, 66)
+                        .addGap(35, 35, 35)
                         .addComponent(rbAdmin)))
-                .addContainerGap(19, Short.MAX_VALUE))
+                .addContainerGap(50, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -881,9 +910,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(7, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 90, 360, 90));
+        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 360, 90));
 
-        panelArchivoTexto.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Uso de archivos (JSON)", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelArchivoTexto.setBackground(new java.awt.Color(204, 204, 255));
+        panelArchivoTexto.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 204)), "Uso de archivos (JSON)", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         btnCargar.setText("Cargar archivo");
 
@@ -915,9 +945,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelArchivoTexto, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 680, 360, 60));
+        getContentPane().add(panelArchivoTexto, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 700, 360, 60));
 
-        panelBotonInicio.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Control de Simulación", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelBotonInicio.setBackground(new java.awt.Color(204, 204, 255));
+        panelBotonInicio.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 204)), "Control de Simulación", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         btnIniciar.setText("Iniciar");
         btnIniciar.addActionListener(new java.awt.event.ActionListener() {
@@ -954,13 +985,14 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(7, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelBotonInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 760, 360, 60));
+        getContentPane().add(panelBotonInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 780, 360, 60));
 
         panelDisco.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         panelDisco.setLayout(new java.awt.GridLayout(1, 0));
         getContentPane().add(panelDisco, new org.netbeans.lib.awtextra.AbsoluteConstraints(8, 8, 2, 2));
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Logs del sistema:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        jPanel3.setBackground(new java.awt.Color(255, 255, 204));
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 204, 0))), "Logs del sistema:", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         txtLogSistema.setEditable(false);
         txtLogSistema.setBackground(new java.awt.Color(255, 255, 255));
@@ -976,7 +1008,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 512, Short.MAX_VALUE)
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
@@ -995,24 +1027,26 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 btnReiniciarActionPerformed(evt);
             }
         });
-        getContentPane().add(btnReiniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 870, -1, -1));
+        getContentPane().add(btnReiniciar, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 880, -1, -1));
 
-        panelDisco1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        panelDisco1.setBackground(new java.awt.Color(204, 255, 255));
+        panelDisco1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 102)), "Visualización del disco", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         javax.swing.GroupLayout panelDisco1Layout = new javax.swing.GroupLayout(panelDisco1);
         panelDisco1.setLayout(panelDisco1Layout);
         panelDisco1Layout.setHorizontalGroup(
             panelDisco1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 388, Short.MAX_VALUE)
+            .addGap(0, 390, Short.MAX_VALUE)
         );
         panelDisco1Layout.setVerticalGroup(
             panelDisco1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 288, Short.MAX_VALUE)
+            .addGap(0, 266, Short.MAX_VALUE)
         );
 
-        getContentPane().add(panelDisco1, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 340, 390, 290));
+        getContentPane().add(panelDisco1, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 340, 400, 290));
 
-        panelZonaArbol.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Árbol (JTree)", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelZonaArbol.setBackground(new java.awt.Color(204, 255, 255));
+        panelZonaArbol.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 102, 102)), "Tabla de asignación de archivos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jScrollPane1.setViewportView(arbolSistema);
 
@@ -1020,10 +1054,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         panelArbol.setLayout(panelArbolLayout);
         panelArbolLayout.setHorizontalGroup(
             panelArbolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelArbolLayout.createSequentialGroup()
+            .addGroup(panelArbolLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 312, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 354, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panelArbolLayout.setVerticalGroup(
             panelArbolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1074,7 +1108,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             .addGroup(panelZonaArbolLayout.createSequentialGroup()
                 .addGap(8, 8, 8)
                 .addComponent(panelArbol, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(panelZonaArbolLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel1)
                     .addComponent(lblRutaSeleccionada))
@@ -1089,9 +1123,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelZonaArbol, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 30, 390, 290));
+        getContentPane().add(panelZonaArbol, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 30, 400, 290));
 
-        panelArchivoTexto1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Implementación de política", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelArchivoTexto1.setBackground(new java.awt.Color(204, 204, 255));
+        panelArchivoTexto1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 204)), "Implementación de política", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         comboPolitica.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "FIFO", "SSTF", "SCAN", "C-SCAN" }));
 
@@ -1119,9 +1154,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelArchivoTexto1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 600, 360, 60));
+        getContentPane().add(panelArchivoTexto1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 620, 360, 60));
 
-        panelTablaProcesos7.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cola de Nuevos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelTablaProcesos7.setBackground(new java.awt.Color(204, 255, 204));
+        panelTablaProcesos7.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 204, 51)), "Cola de Nuevos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jTableNuevos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1159,7 +1195,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             panelTablaProcesos7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(panelTablaProcesos7Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(tablaProcesos7, javax.swing.GroupLayout.DEFAULT_SIZE, 498, Short.MAX_VALUE)
+                .addComponent(tablaProcesos7, javax.swing.GroupLayout.DEFAULT_SIZE, 508, Short.MAX_VALUE)
                 .addContainerGap())
         );
         panelTablaProcesos7Layout.setVerticalGroup(
@@ -1170,9 +1206,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addGap(19, 19, 19))
         );
 
-        getContentPane().add(panelTablaProcesos7, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 30, 520, 150));
+        getContentPane().add(panelTablaProcesos7, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 30, 530, 150));
 
-        panelTablaProcesos10.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cola de Listos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelTablaProcesos10.setBackground(new java.awt.Color(204, 255, 204));
+        panelTablaProcesos10.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 204, 102)), "Cola de Bloqueados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jTableListos.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1223,7 +1260,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         getContentPane().add(panelTablaProcesos10, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 200, -1, 140));
 
-        panelTablaProcesos11.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cola de Ejecutados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelTablaProcesos11.setBackground(new java.awt.Color(204, 255, 204));
+        panelTablaProcesos11.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 204, 102)), "Cola de Bloqueados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jTableEjecutados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1274,7 +1312,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         getContentPane().add(panelTablaProcesos11, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 360, -1, 130));
 
-        panelTablaProcesos12.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cola de Bloqueados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelTablaProcesos12.setBackground(new java.awt.Color(204, 255, 204));
+        panelTablaProcesos12.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 204, 102)), "Cola de Bloqueados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jTableBloqueados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1325,7 +1364,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
         getContentPane().add(panelTablaProcesos12, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 510, -1, 130));
 
-        panelTablaProcesos13.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cola de Terminados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+        panelTablaProcesos13.setBackground(new java.awt.Color(204, 255, 204));
+        panelTablaProcesos13.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 204, 102)), "Cola de Bloqueados", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
         jTableTerminados.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -1375,6 +1415,40 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         );
 
         getContentPane().add(panelTablaProcesos13, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 660, 530, 120));
+
+        jPanel4.setBackground(new java.awt.Color(204, 255, 204));
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createCompoundBorder(), "", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
+
+        jLabel12.setFont(new java.awt.Font("Helvetica Neue", 3, 16)); // NOI18N
+        jLabel12.setText("Simulador Virtual de Sistema de Archivos");
+
+        jLabel13.setFont(new java.awt.Font("Helvetica Neue", 3, 14)); // NOI18N
+        jLabel13.setText("con Gestión de Permisos y Asignación de Bloques");
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jLabel12)
+                .addGap(22, 22, 22))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 348, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel12, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, 26, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        getContentPane().add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 360, 70));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -1458,6 +1532,9 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             sistemaArchivos.crearDirectorio(rutaDirectorio, nombre);
             logSistema("Directorio creado directamente: " + rutaCompleta);
         }
+        
+        txtNombre.setText("");
+        
 
         // actualizar vista
         actualizarTablasProcesos();
@@ -1541,6 +1618,8 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             return;
         }
         actualizarTablasProcesos();
+        
+        txtNuevoNombre.setText("");
     }//GEN-LAST:event_btnRenombrarSeleccionActionPerformed
 
     /**
@@ -1587,6 +1666,10 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.ButtonGroup grupoModo;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -1598,6 +1681,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
