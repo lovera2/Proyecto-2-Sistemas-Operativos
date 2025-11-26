@@ -2,17 +2,16 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package Procesos;
-
-import Componentes.GestorDisco;
-import Estructuras.Cola;
-import java.util.concurrent.Semaphore;
-
 /*
  * Gestor de procesos de E/S: mantiene las colas
  * Nuevos, Listos, Ejecución, Bloqueados y Terminados
  * y simula el avance del tiempo (ticks).
  */
+package Procesos;
+
+import Componentes.GestorDisco;
+import Estructuras.Cola;
+import java.util.concurrent.Semaphore;
 
 public class GestorProcesoES {
 
@@ -58,7 +57,8 @@ public class GestorProcesoES {
 
     /** Proceso CREAR: se crea en NUEVOS. */
     public void crearProcesoCrear(String ruta, int pista, int tamBloques) {
-        ProcesoES p = new ProcesoES(generarId(), "CREAR", ruta, pista);
+        int pistaLogica = calcularPistaDesdeRuta(ruta);   // <<< usa la ruta
+        ProcesoES p = new ProcesoES(generarId(), "CREAR", ruta, pistaLogica);
         p.setEstado("nuevo");
         p.setTamanoEnBloques(tamBloques);
 
@@ -66,6 +66,7 @@ public class GestorProcesoES {
             mutexColas.acquire();
             colaNuevos.encolar(p);
         } catch (InterruptedException e) {
+            // puedes loggear si quieres
         } finally {
             mutexColas.release();
         }
@@ -73,7 +74,8 @@ public class GestorProcesoES {
 
     /** Proceso ELIMINAR. */
     public void crearProcesoEliminar(String ruta, int pista) {
-        ProcesoES p = new ProcesoES(generarId(), "ELIMINAR", ruta, pista);
+        int pistaLogica = calcularPistaDesdeRuta(ruta);
+        ProcesoES p = new ProcesoES(generarId(), "ELIMINAR", ruta, pistaLogica);
         p.setEstado("nuevo");
 
         try {
@@ -87,7 +89,8 @@ public class GestorProcesoES {
 
     /** Proceso LEER. */
     public void crearProcesoLeer(String ruta, int pista) {
-        ProcesoES p = new ProcesoES(generarId(), "LEER", ruta, pista);
+        int pistaLogica = calcularPistaDesdeRuta(ruta);
+        ProcesoES p = new ProcesoES(generarId(), "LEER", ruta, pistaLogica);
         p.setEstado("nuevo");
 
         try {
@@ -106,12 +109,13 @@ public class GestorProcesoES {
                                              int pista) {
 
         String rutaCompleta = rutaDirectorio + "/" + nombreViejo;
+        int pistaLogica = calcularPistaDesdeRuta(rutaCompleta);
 
         ProcesoES p = new ProcesoES(
                 generarId(),
                 "RENOMBRAR_ARCHIVO",
                 rutaCompleta,
-                pista
+                pistaLogica
         );
         p.setEstado("nuevo");
         p.setNuevoNombre(nombreNuevo);
@@ -132,12 +136,13 @@ public class GestorProcesoES {
                                                 String nombreNuevo,
                                                 int pista) {
         String rutaCompleta = rutaPadre + "/" + nombreViejo;
+        int pistaLogica = calcularPistaDesdeRuta(rutaCompleta);
 
         ProcesoES p = new ProcesoES(
                 generarId(),
                 "RENOMBRAR_DIRECTORIO",
                 rutaCompleta,
-                pista
+                pistaLogica
         );
         p.setEstado("nuevo");
         p.setNuevoNombre(nombreNuevo);
@@ -161,8 +166,10 @@ public class GestorProcesoES {
             mutexColas.acquire();
             while (colaNuevos.verTamano() > 0) {
                 ProcesoES p = colaNuevos.desencolar();
-                p.setEstado("listo");
-                colaListos.encolar(p);
+                if (p != null) {
+                    p.setEstado("listo");
+                    colaListos.encolar(p);
+                }
             }
         } catch (InterruptedException e) {
         } finally {
@@ -174,15 +181,10 @@ public class GestorProcesoES {
     //      LISTO -> EJECUTANDO -> BLOQUEADO -> TERMINADO
     // =========================================================
 
-    /**
-     * Despacha un proceso de LISTOS a EJECUCIÓN
-     * (si no hay ninguno ejecutando).
-     */
     public ProcesoES despacharSiguiente() {
         try {
             mutexColas.acquire();
 
-            // Solo un proceso de E/S en ejecución (un solo disco)
             if (colaEjecucion.verTamano() > 0) {
                 return null;
             }
@@ -192,10 +194,7 @@ public class GestorProcesoES {
                 return null;
             }
 
-            // El planificador puede ya marcarlo como "ejecutando",
-            // pero por si acaso lo volvemos a fijar.
             p.setEstado("ejecutando");
-            // 1 "tick" de CPU para emitir la petición de E/S
             p.setTiempoRestanteES(1);
             colaEjecucion.encolar(p);
 
@@ -208,11 +207,6 @@ public class GestorProcesoES {
         }
     }
 
-    /**
-     * Avanza un tick para los procesos en EJECUCIÓN.
-     * Cuando terminan su ráfaga de CPU pasan a BLOQUEADOS
-     * con un tiempo de E/S calculado.
-     */
     public void tickEjecucion() {
         try {
             mutexColas.acquire();
@@ -226,7 +220,6 @@ public class GestorProcesoES {
                     p.setTiempoRestanteES(t);
 
                     if (t <= 0) {
-                        // pasa a BLOQUEADO (esperando disco)
                         colaEjecucion.removeAt(i);
                         n--;
 
@@ -234,7 +227,7 @@ public class GestorProcesoES {
                         p.setTiempoRestanteES(calcularTiempoES(p));
                         colaBloqueados.encolar(p);
 
-                        continue; // no incrementamos i
+                        continue;
                     }
                 }
                 i++;
@@ -246,13 +239,9 @@ public class GestorProcesoES {
         }
     }
 
-    /**
-     * Tiempo de servicio de disco simulado.
-     */
     private int calcularTiempoES(ProcesoES p) {
         String tipo = p.getTipoOperacion();
 
-        // renombrar: costo pequeño
         if (tipo != null && tipo.startsWith("RENOMBRAR")) {
             return 2; // 2 ticks
         }
@@ -261,14 +250,9 @@ public class GestorProcesoES {
         if (bloques <= 0) {
             bloques = 1;
         }
-        return bloques * 2; // cada bloque = 2 ticks
+        return bloques * 2;
     }
 
-    /**
-     * Avanza un tick para los BLOQUEADOS.
-     * Cuando tES llega a 0: ejecuta la operación real en disco
-     * y pasa a TERMINADO.
-     */
     public void tickBloqueados() {
         try {
             mutexColas.acquire();
@@ -282,7 +266,6 @@ public class GestorProcesoES {
                     p.setTiempoRestanteES(t);
 
                     if (t <= 0) {
-                        // Termina su E/S
                         colaBloqueados.removeAt(i);
                         n--;
 
@@ -291,7 +274,7 @@ public class GestorProcesoES {
                         p.setEstado("terminado");
                         colaTerminados.encolar(p);
 
-                        continue; // no incrementamos i
+                        continue;
                     }
                 }
                 i++;
@@ -303,17 +286,12 @@ public class GestorProcesoES {
         }
     }
 
-    // =========================================================
-    //              EJECUCIÓN REAL EN DISCO
-    // =========================================================
-
     private void ejecutarOperacionReal(ProcesoES p) {
         if (gestorDisco == null || p == null) return;
 
         String tipo = p.getTipoOperacion();
         String rutaCompleta = p.getRutaArchivo();
 
-        // separar ruta en directorio + nombre
         String rutaDirectorio = "/";
         String nombreArchivo = rutaCompleta;
 
@@ -357,10 +335,6 @@ public class GestorProcesoES {
         }
     }
 
-    // =========================================================
-    //              HELPERS PARA LAS TABLAS (JTable)
-    // =========================================================
-
     public Object[][] obtenerTablaNuevos() {
         try {
             mutexColas.acquire();
@@ -383,7 +357,7 @@ public class GestorProcesoES {
         }
     }
 
-    public Object[][] obtenerTablaEjecucion() {
+    public Object[][] obtenerTablaEjecutados() {
         try {
             mutexColas.acquire();
             return construirMatrizDesdeCola(colaEjecucion);
@@ -435,5 +409,21 @@ public class GestorProcesoES {
             i++;
         }
         return data;
+    }
+
+    // Número de pistas lógicas = cantidad de bloques del disco
+    private int calcularPistaDesdeRuta(String ruta) {
+        if (gestorDisco == null || gestorDisco.getSistemaArchivos() == null) {
+            return 0;
+        }
+
+        int totalPistas = gestorDisco.getSistemaArchivos()
+                                     .getDisco()
+                                     .getCantidadBloques();   // 64 en tu caso
+
+        if (ruta == null) return 0;
+
+        int h = Math.abs(ruta.hashCode());
+        return h % totalPistas;   // valor entre 0 y totalPistas-1
     }
 }

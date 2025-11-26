@@ -102,9 +102,12 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     /** Habilita o deshabilita acciones solo-admin. */
     private void toggleModo(boolean admin) {
         btnCrear.setEnabled(admin);
+        comboTipoObjeto.setEnabled(admin);
         btnEliminarSeleccion.setEnabled(admin);
         btnRenombrarSeleccion.setEnabled(admin);
         txtNuevoNombre.setEnabled(admin);
+        txtNombre.setEnabled(admin);
+        spinTamanoBloques.setEnabled(admin);
         // leer siempre permitido
     }
 
@@ -263,7 +266,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     // Cada método lo implementas en GestorProcesoES
     Object[][] nuevos      = gestorProcesoES.obtenerTablaNuevos();
     Object[][] listos      = gestorProcesoES.obtenerTablaListos();
-    Object[][] ejecutados  = gestorProcesoES.obtenerTablaEjecucion();
+    Object[][] ejecutados  = gestorProcesoES.obtenerTablaEjecutados();
     Object[][] bloqueados  = gestorProcesoES.obtenerTablaBloqueados();
     Object[][] terminados  = gestorProcesoES.obtenerTablaTerminados();
 
@@ -466,6 +469,30 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         spinTamanoBloques.setEnabled(esArchivo);
         jLabel6.setEnabled(esArchivo); // etiqueta "Tamaño (cant. de bloques):"
     }
+    
+    private boolean existeNombreEnDirectorio(Directorio dir, String nombreBuscado) {
+        // Revisar archivos
+        Estructuras.Nodo nodoArch = dir.getArchivos().getFirst();
+        while (nodoArch != null) {
+            Archivo a = (Archivo) nodoArch.getDato();
+            if (a.getNombre().equals(nombreBuscado)) {
+                return true;
+            }
+            nodoArch = nodoArch.getNext();
+        }
+
+        // Revisar subdirectorios
+        Estructuras.Nodo nodoSub = dir.getSubdirectorios().getFirst();
+        while (nodoSub != null) {
+            Directorio d = (Directorio) nodoSub.getDato();
+            if (d.getNombre().equals(nombreBuscado)) {
+                return true;
+            }
+            nodoSub = nodoSub.getNext();
+        }
+
+        return false;
+}
 
     private void comboPoliticaActionPerformed(java.awt.event.ActionEvent evt) {
         String politica = (String) comboPolitica.getSelectedItem();
@@ -587,6 +614,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         jTableTerminados = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setBackground(new java.awt.Color(204, 204, 255));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jPanel1.setLayout(new java.awt.BorderLayout());
@@ -884,7 +912,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelArchivoTexto, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 600, 360, 60));
+        getContentPane().add(panelArchivoTexto, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 680, 360, 60));
 
         panelBotonInicio.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Control de Simulación", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
@@ -923,7 +951,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(7, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelBotonInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 670, 360, 60));
+        getContentPane().add(panelBotonInicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 760, 360, 60));
 
         panelDisco.setBorder(javax.swing.BorderFactory.createTitledBorder(""));
         panelDisco.setLayout(new java.awt.GridLayout(1, 0));
@@ -1088,7 +1116,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(panelArchivoTexto1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 740, 360, 60));
+        getContentPane().add(panelArchivoTexto1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 600, 360, 60));
 
         panelTablaProcesos7.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Cola de Nuevos", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Helvetica Neue", 3, 13))); // NOI18N
 
@@ -1369,7 +1397,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGuardarEstadoActionPerformed
 
     private void btnCrearActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCrearActionPerformed
-        // Solo admin puede crear
+
         if (!rbAdmin.isSelected()) {
             mostrarMensajeUsuario("Solo el modo Administrador puede crear.");
             return;
@@ -1407,23 +1435,33 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                             rutaDirectorio + nombre :
                             rutaDirectorio + "/" + nombre;
 
-        // Pista de disco (por ahora usa 0, luego el planificador de pistas)
-        int pista = 0;
-
         if ("Archivo".equals(tipo)) {
-            gestorProcesoES.crearProcesoCrear(rutaCompleta, pista, tamBloques);
+            // validar que no exista ya ese nombre en este directorio
+            if (existeNombreEnDirectorio(dirDestino, nombre)) {
+                mostrarMensajeUsuario("Ya existe un archivo o directorio con ese nombre en esta ruta.");
+                return;
+            }
+
+            // pista la calculas dentro de GestorProcesoES; aquí mando 0
+            gestorProcesoES.crearProcesoCrear(rutaCompleta, 0, tamBloques);
             logSistema("Se creó proceso CREAR para archivo " + rutaCompleta);
-        } else {
-            // Crear directorio directamente en el sistema de archivos
+
+        } else { // Directorio
+            if (existeNombreEnDirectorio(dirDestino, nombre)) {
+                mostrarMensajeUsuario("Ya existe un archivo o directorio con ese nombre en esta ruta.");
+                return;
+            }
+
             sistemaArchivos.crearDirectorio(rutaDirectorio, nombre);
             logSistema("Directorio creado directamente: " + rutaCompleta);
         }
 
-        // actualizar vista de procesos y estructuras
-        actualizarTablasProcesos();
+        // actualizar vista
+        actualizarTablaProcesos();
         refrescarArbol();
         refrescarTablaAsignacion();
-        refrescarProcesosYDisco();                 
+        refrescarProcesosYDisco();
+                      
     }//GEN-LAST:event_btnCrearActionPerformed
 
     private void btnIniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnIniciarActionPerformed
