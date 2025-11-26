@@ -4,6 +4,8 @@
  */
 package Componentes;
 
+import java.awt.Color;
+
 /**
  * Representa un archivo dentro del sistema de archivos lógico.
  * Cada archivo tiene:
@@ -21,28 +23,29 @@ public class Archivo {
     
     private String nombre;
     private int tamañoEnBloques;
-    private int primerBloque;   //índice del primer bloque en SimulacionDiscoSD
-    private String colorArchivo; //Color lógico para la interfaz
+    private int primerBloque;     // índice del primer bloque en SimulacionDiscoSD
+    private Color colorArchivo;   // Color lógico para la interfaz
     private String propietario;      
-    private String permisos;          
+    private String permisos;  
 
-    //Proceso que creó el archivo (para estadísticas / tabla de asignación)
+    // Proceso que creó el archivo (para estadísticas / tabla de asignación)
     private int idProcesoCreador;
 
-  
     public Archivo(String nombre, int tamañoEnBloques, int primerBloque) {
         this.nombre = nombre;
         this.tamañoEnBloques = tamañoEnBloques;
         this.primerBloque = primerBloque;
-        this.colorArchivo = "gris";   //color por defecto
 
-        //Valores por defecto para permisos/propietario/proceso creador
+        // Color aleatorio para este archivo
+        this.colorArchivo = new Color((int)(Math.random() * 0xFFFFFF));
+
+        // Valores por defecto para permisos/propietario/proceso creador
         this.propietario = null;      
         this.permisos = "rw";         
-        this.idProcesoCreador = -1;  
+        this.idProcesoCreador = -1; 
     }
 
-    //Getters y setters básicos
+    // Getters y setters básicos
 
     public String getNombre() {
         return nombre;
@@ -68,15 +71,17 @@ public class Archivo {
         this.primerBloque = primerBloque;
     }
 
-    public String getColorArchivo() {
+    // Color
+
+    public Color getColorArchivo() {
         return colorArchivo;
     }
 
-    public void setColorArchivo(String colorArchivo) {
+    public void setColorArchivo(Color colorArchivo) {
         this.colorArchivo = colorArchivo;
     }
 
-    //Getters y setters de permisos
+    // Getters y setters de permisos / dueño
 
     public String getPropietario() {
         return propietario;
@@ -100,5 +105,10 @@ public class Archivo {
 
     public void setIdProcesoCreador(int idProcesoCreador) {
         this.idProcesoCreador = idProcesoCreador;
+    }
+    
+    @Override
+    public String toString() {
+        return nombre;   
     }
 }

@@ -4,6 +4,8 @@
  */
 package Componentes;
 
+import java.awt.Color;
+
 /**
  * Representa la Simulación de un Disco (SD) como un arreglo de bloques.
  * Cada bloque puede estar libre u ocupado y puede estar enlazado a otro
@@ -43,36 +45,38 @@ public class SimulacionDiscoSD {
     }
 
     /**
-     * Marca un bloque como ocupado si estaba libre.
-     * No modifica el encadenamiento (campo siguiente).
+     * Marca un bloque como ocupado si estaba libre (sin preocuparse por color).
+     * Esto se usa solo en casos genéricos. Para archivos, es mejor usar
+     * reservarBloques(cantidad, colorArchivo).
      */
     public void marcarBloqueOcupado(int indice) {
         if (indice < 0 || indice >= cantidadBloques) {
             return;
         }
         if (!bloques[indice].isOcupado()) {
+            // lo marcamos ocupado sin color específico
             bloques[indice].setOcupado(true);
             bloquesLibres--;
         }
     }
 
     /**
-     * Marca un bloque como libre y rompe cualquier enlace de asignación encadenada.
+     * Marca un bloque como libre y rompe cualquier enlace de asignación encadenada,
+     * limpiando también el color.
      */
     public void marcarBloqueLibre(int indice) {
         if (indice < 0 || indice >= cantidadBloques) {
             return;
         }
         if (bloques[indice].isOcupado()) {
-            bloques[indice].setOcupado(false);
-            bloques[indice].setSiguiente(-1); // -1 = no hay siguiente bloque
+            bloques[indice].liberar();   // <-- usa el método nuevo del Bloque
             bloquesLibres++;
         }
     }
     
     /**
      * Reserva una cantidad de bloques libres en el SD y los enlaza
-     * mediante asignación encadenada.
+     * mediante asignación encadenada (sin asignar color).
      * 
      * @param cantidad número de bloques que necesita el archivo
      * @return índice del primer bloque de la cadena, o -1 si no hay espacio suficiente
@@ -92,7 +96,7 @@ public class SimulacionDiscoSD {
 
         for (int i = 0; i < cantidadBloques && reservados < cantidad; i++) {
             if (!bloques[i].isOcupado()) {
-                // Marcar como ocupado
+                // Marcar como ocupado (sin color todavía)
                 bloques[i].setOcupado(true);
                 bloquesLibres--;
 
@@ -107,18 +111,13 @@ public class SimulacionDiscoSD {
             }
         }
 
-        /** Seguridad/fiabilidad: si por algún motivo no se logra
-        * reservar la cantidad completa de bloques, se revierte
-        * todo lo que se había hecho para dejar el disco en un
-        * estado consistente (todo o nada).
-        */
+        // all-or-nothing
         if (reservados < cantidad) {
             int actual = primero;
             while (actual != -1) {
                 Bloque b = bloques[actual];
                 int sig = b.getSiguiente();
-                b.setOcupado(false);
-                b.setSiguiente(-1);
+                b.liberar();      // libera y limpia color / siguiente
                 bloquesLibres++;
                 actual = sig;
             }
@@ -128,6 +127,26 @@ public class SimulacionDiscoSD {
         // El último bloque apunta a -1 (fin de la cadena)
         bloques[anterior].setSiguiente(-1);
         return primero;
+    }
+
+    /**
+     * Versión cómoda: reserva bloques y les asigna el color del archivo.
+     * No rompe nada de tu código actual porque es un método nuevo.
+     */
+    public int reservarBloques(int cantidad, Color colorArchivo) {
+        int primerBloque = reservarBloques(cantidad);
+        if (primerBloque == -1) {
+            return -1;
+        }
+
+        int actual = primerBloque;
+        while (actual != -1) {
+            Bloque b = bloques[actual];
+            b.setColorBloque(colorArchivo);
+            actual = b.getSiguiente();
+        }
+
+        return primerBloque;
     }
 
     /**
@@ -143,12 +162,10 @@ public class SimulacionDiscoSD {
             Bloque b = bloques[actual];
             int siguiente = b.getSiguiente(); // se guarda antes de romper el enlace
             if (b.isOcupado()) {
-                b.setOcupado(false);
-                b.setSiguiente(-1);
+                b.liberar();   // limpia ocupado, siguiente y color
                 bloquesLibres++;
             }
             actual = siguiente;
         }
     }
-    
 }

@@ -11,67 +11,63 @@ package Procesos;
 public class ProcesoES {
     
     private int idProceso;
-    private String tipoOperacion;   // "CREAR", "ELIMINAR", "LEER", etc.
+    private String tipoOperacion;   // "CREAR", "ELIMINAR", "LEER", "RENOMBRAR_ARCHIVO", "RENOMBRAR_DIRECTORIO"
     private String rutaArchivo;     // Ej: "/Documentos/SO/Proyecto2.txt"
     private int posicionCabezal;    // posición en el disco (pista)
     private String estado;          
     private int tamanoEnBloques;
     private int tiempoRestanteES;
 
-    /**
-     * Constructor básico del proceso de E/S.
-     */
+    private String nuevoNombre;     // nombre nuevo en un renombrado
+    private boolean esDirectorio;   // true si es renombrar directorio
+
     public ProcesoES(int idProceso, String tipoOperacion, String rutaArchivo, int posicionCabezal) {
         this.idProceso = idProceso;
         this.tipoOperacion = tipoOperacion;
         this.rutaArchivo = rutaArchivo;
         this.posicionCabezal = posicionCabezal;
         this.estado = "nuevo";
-        this.tamanoEnBloques = 0;    // por defecto, si no se usa (ELIMINAR, LEER, etc.)
-        this.tiempoRestanteES = 0;   // se fijará cuando vaya a BLOQUEADO
+        this.tamanoEnBloques = 0;
+        this.tiempoRestanteES = 0;
+        this.nuevoNombre = null;
+        this.esDirectorio = false;
     }
 
-    // ==========================
-    // Getters y setters básicos
-    // ==========================
+    // Getters y setters
 
-    public int getIdProceso() {
-        return idProceso;
+    public int getIdProceso() { return idProceso; }
+
+    public String getTipoOperacion() { return tipoOperacion; }
+
+    public String getRutaArchivo() { return rutaArchivo; }
+
+    public int getPosicionCabezal() { return posicionCabezal; }
+
+    public String getEstado() { return estado; }
+
+    public void setEstado(String nuevoEstado) { this.estado = nuevoEstado; }
+
+    public int getTamanoEnBloques() { return tamanoEnBloques; }
+
+    public void setTamanoEnBloques(int tamanoEnBloques) { this.tamanoEnBloques = tamanoEnBloques; }
+
+    public int getTiempoRestanteES() { return tiempoRestanteES; }
+
+    public void setTiempoRestanteES(int tiempoRestanteES) { this.tiempoRestanteES = tiempoRestanteES; }
+
+    public String getNuevoNombre() {
+        return nuevoNombre;
     }
 
-    public String getTipoOperacion() {
-        return tipoOperacion;
+    public void setNuevoNombre(String nuevoNombre) {
+        this.nuevoNombre = nuevoNombre;
     }
 
-    public String getRutaArchivo() {
-        return rutaArchivo;
+    public boolean isEsDirectorio() {
+        return esDirectorio;
     }
 
-    public int getPosicionCabezal() {
-        return posicionCabezal;
-    }
-
-    public String getEstado() {
-        return estado;
-    }
-
-    public void setEstado(String nuevoEstado) {
-        this.estado = nuevoEstado;
-    }
-
-    public int getTamanoEnBloques() {
-        return tamanoEnBloques;
-    }
-
-    public void setTamanoEnBloques(int tamanoEnBloques) {
-        this.tamanoEnBloques = tamanoEnBloques;
-    }
-
-    public int getTiempoRestanteES() {
-        return tiempoRestanteES;
-    }
-
-    public void setTiempoRestanteES(int tiempoRestanteES) {
-        this.tiempoRestanteES = tiempoRestanteES;
+    public void setEsDirectorio(boolean esDirectorio) {
+        this.esDirectorio = esDirectorio;
     }
 }

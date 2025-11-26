@@ -101,13 +101,11 @@ public class SistemaArchivos {
     public Archivo crearArchivo(String rutaDirectorio, String nombreArchivo, int tamañoEnBloques) {
         Directorio dir = obtenerDirectorioDesdeRuta(rutaDirectorio);
         if (dir == null) {
-            // ruta inválida
             return null;
         }
 
         // Evitar duplicados de archivo en el mismo directorio
         if (dir.buscarArchivo(nombreArchivo) != null) {
-            // ya existe archivo con ese nombre
             return null;
         }
 
@@ -117,20 +115,25 @@ public class SistemaArchivos {
             return null;
         }
 
-        // Reservar bloques en el SD (asignación encadenada)
-        int primerBloque = disco.reservarBloques(tamañoEnBloques);
+        // 1) Crear el archivo lógico (sin bloques todavía)
+        //    Usa -1 como valor temporal para primerBloque
+        Archivo nuevo = new Archivo(nombreArchivo, tamañoEnBloques, -1);
+
+        // 2) Reservar bloques en el SD pasando el color del archivo
+        int primerBloque = disco.reservarBloques(tamañoEnBloques, nuevo.getColorArchivo());
         if (primerBloque == -1) {
             // no se pudo reservar la cadena de bloques
             return null;
         }
 
-        // Crear el archivo lógico y agregarlo al directorio
-        Archivo nuevo = new Archivo(nombreArchivo, tamañoEnBloques, primerBloque);
+        // 3) Actualizar el primer bloque del archivo
+        nuevo.setPrimerBloque(primerBloque);
+
+        // 4) Agregar el archivo al directorio
         dir.agregarArchivo(nuevo);
 
         return nuevo;
-    }
-    
+}
     /**
     * Elimina un archivo dentro de un directorio dado.
     * Libera los bloques que usaba en el disco simulado.

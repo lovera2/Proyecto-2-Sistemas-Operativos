@@ -8,16 +8,24 @@ import Componentes.GestorDisco;
 import Estructuras.Cola;
 import java.util.concurrent.Semaphore;
 
+/*
+ * Gestor de procesos de E/S: mantiene las colas
+ * Nuevos, Listos, Ejecución, Bloqueados y Terminados
+ * y simula el avance del tiempo (ticks).
+ */
+
 public class GestorProcesoES {
 
+    // Colas de estado
     private Cola<ProcesoES> colaNuevos;
     private Cola<ProcesoES> colaListos;
+    private Cola<ProcesoES> colaEjecucion;
     private Cola<ProcesoES> colaBloqueados;
     private Cola<ProcesoES> colaTerminados;
 
     private final Semaphore mutexColas;  // exclusión mutua
 
-    private Planificador planificador;   // políticas FIFO/SSTF/SCAN/CSCAN
+    private Planificador planificador;   // FIFO / SSTF / SCAN / CSCAN
     private GestorDisco gestorDisco;     // para ejecutar la operación real en disco
 
     // contador simple de ids
@@ -26,10 +34,10 @@ public class GestorProcesoES {
     public GestorProcesoES(Planificador planificador, GestorDisco gestorDisco) {
         this.colaNuevos     = new Cola<>();
         this.colaListos     = new Cola<>();
+        this.colaEjecucion  = new Cola<>();
         this.colaBloqueados = new Cola<>();
         this.colaTerminados = new Cola<>();
         this.mutexColas     = new Semaphore(1);
-
         this.planificador   = planificador;
         this.gestorDisco    = gestorDisco;
     }
@@ -38,7 +46,9 @@ public class GestorProcesoES {
         return planificador;
     }
 
-    // ====== creación / admisión ======
+    // =========================================================
+    //               CREACIÓN / ADMISIÓN
+    // =========================================================
 
     private int generarId() {
         int id = siguienteId;
@@ -46,103 +56,148 @@ public class GestorProcesoES {
         return id;
     }
 
-    /**
-     * Crea un ProcesoES tipo CREAR y lo mete en NUEVOS -> LISTOS.
-     */
+    /** Proceso CREAR: se crea en NUEVOS. */
     public void crearProcesoCrear(String ruta, int pista, int tamBloques) {
-        ProcesoES p = new ProcesoES(
-                generarId(),
-                "CREAR",
-                ruta,
-                pista
-        );
+        ProcesoES p = new ProcesoES(generarId(), "CREAR", ruta, pista);
         p.setEstado("nuevo");
         p.setTamanoEnBloques(tamBloques);
 
         try {
             mutexColas.acquire();
-
             colaNuevos.encolar(p);
-
-            // admisión inmediata -> LISTO
-            moverAListosSinLock(p);
-
         } catch (InterruptedException e) {
         } finally {
             mutexColas.release();
         }
     }
 
-    /**
-     * Crea un ProcesoES tipo ELIMINAR.
-     */
+    /** Proceso ELIMINAR. */
     public void crearProcesoEliminar(String ruta, int pista) {
-        ProcesoES p = new ProcesoES(
-                generarId(),
-                "ELIMINAR",
-                ruta,
-                pista
-        );
+        ProcesoES p = new ProcesoES(generarId(), "ELIMINAR", ruta, pista);
         p.setEstado("nuevo");
 
         try {
             mutexColas.acquire();
             colaNuevos.encolar(p);
-            moverAListosSinLock(p);
         } catch (InterruptedException e) {
         } finally {
             mutexColas.release();
         }
     }
 
-    /**
-     * Crea un ProcesoES tipo LEER.
-     */
+    /** Proceso LEER. */
     public void crearProcesoLeer(String ruta, int pista) {
-        ProcesoES p = new ProcesoES(
-                generarId(),
-                "LEER",
-                ruta,
-                pista
-        );
+        ProcesoES p = new ProcesoES(generarId(), "LEER", ruta, pista);
         p.setEstado("nuevo");
 
         try {
             mutexColas.acquire();
             colaNuevos.encolar(p);
-            moverAListosSinLock(p);
         } catch (InterruptedException e) {
         } finally {
             mutexColas.release();
         }
     }
 
-    private void moverAListosSinLock(ProcesoES p) {
-        p.setEstado("listo");
-        colaListos.encolar(p);
+    /** Proceso RENOMBRAR ARCHIVO (Update). */
+    public void crearProcesoRenombrarArchivo(String rutaDirectorio,
+                                             String nombreViejo,
+                                             String nombreNuevo,
+                                             int pista) {
+
+        String rutaCompleta = rutaDirectorio + "/" + nombreViejo;
+
+        ProcesoES p = new ProcesoES(
+                generarId(),
+                "RENOMBRAR_ARCHIVO",
+                rutaCompleta,
+                pista
+        );
+        p.setEstado("nuevo");
+        p.setNuevoNombre(nombreNuevo);
+        p.setEsDirectorio(false);
+
+        try {
+            mutexColas.acquire();
+            colaNuevos.encolar(p);
+        } catch (InterruptedException e) {
+        } finally {
+            mutexColas.release();
+        }
     }
 
-    // ====== LISTO -> EJECUTANDO -> BLOQUEADO ======
+    /** Proceso RENOMBRAR DIRECTORIO (Update). */
+    public void crearProcesoRenombrarDirectorio(String rutaPadre,
+                                                String nombreViejo,
+                                                String nombreNuevo,
+                                                int pista) {
+        String rutaCompleta = rutaPadre + "/" + nombreViejo;
+
+        ProcesoES p = new ProcesoES(
+                generarId(),
+                "RENOMBRAR_DIRECTORIO",
+                rutaCompleta,
+                pista
+        );
+        p.setEstado("nuevo");
+        p.setNuevoNombre(nombreNuevo);
+        p.setEsDirectorio(true);
+
+        try {
+            mutexColas.acquire();
+            colaNuevos.encolar(p);
+        } catch (InterruptedException e) {
+        } finally {
+            mutexColas.release();
+        }
+    }
 
     /**
-     * Usa el planificador para elegir el siguiente proceso a ejecutar.
-     * Lo saca de LISTOS y lo pasa a BLOQUEADO simulando que está esperando E/S.
+     * Admite TODOS los procesos de NUEVOS a LISTOS.
+     * Llamar una vez por tick desde la GUI.
+     */
+    public void admitirNuevosAListos() {
+        try {
+            mutexColas.acquire();
+            while (colaNuevos.verTamano() > 0) {
+                ProcesoES p = colaNuevos.desencolar();
+                p.setEstado("listo");
+                colaListos.encolar(p);
+            }
+        } catch (InterruptedException e) {
+        } finally {
+            mutexColas.release();
+        }
+    }
+
+    // =========================================================
+    //      LISTO -> EJECUTANDO -> BLOQUEADO -> TERMINADO
+    // =========================================================
+
+    /**
+     * Despacha un proceso de LISTOS a EJECUCIÓN
+     * (si no hay ninguno ejecutando).
      */
     public ProcesoES despacharSiguiente() {
         try {
             mutexColas.acquire();
 
-            //Ahora el planificador necesita la cola de LISTOS
+            // Solo un proceso de E/S en ejecución (un solo disco)
+            if (colaEjecucion.verTamano() > 0) {
+                return null;
+            }
+
             ProcesoES p = planificador.obtenerSiguienteProceso(colaListos);
             if (p == null) {
                 return null;
             }
 
-            // El planificador ya lo sacó de colaListos y lo marcó "ejecutando".
-            //Aquí simulamos que va a disco: pasa a BLOQUEADO.
-            p.setEstado("bloqueado");
-            p.setTiempoRestanteES(calcularTiempoES(p));
-            colaBloqueados.encolar(p);
+            // El planificador puede ya marcarlo como "ejecutando",
+            // pero por si acaso lo volvemos a fijar.
+            p.setEstado("ejecutando");
+            // 1 "tick" de CPU para emitir la petición de E/S
+            p.setTiempoRestanteES(1);
+            colaEjecucion.encolar(p);
 
             return p;
 
@@ -154,24 +209,65 @@ public class GestorProcesoES {
     }
 
     /**
+     * Avanza un tick para los procesos en EJECUCIÓN.
+     * Cuando terminan su ráfaga de CPU pasan a BLOQUEADOS
+     * con un tiempo de E/S calculado.
+     */
+    public void tickEjecucion() {
+        try {
+            mutexColas.acquire();
+
+            int n = colaEjecucion.verTamano();
+            int i = 0;
+            while (i < n) {
+                ProcesoES p = colaEjecucion.getAt(i);
+                if (p != null) {
+                    int t = p.getTiempoRestanteES() - 1;
+                    p.setTiempoRestanteES(t);
+
+                    if (t <= 0) {
+                        // pasa a BLOQUEADO (esperando disco)
+                        colaEjecucion.removeAt(i);
+                        n--;
+
+                        p.setEstado("bloqueado");
+                        p.setTiempoRestanteES(calcularTiempoES(p));
+                        colaBloqueados.encolar(p);
+
+                        continue; // no incrementamos i
+                    }
+                }
+                i++;
+            }
+
+        } catch (InterruptedException e) {
+        } finally {
+            mutexColas.release();
+        }
+    }
+
+    /**
      * Tiempo de servicio de disco simulado.
-     * Puedes ajustar el factor según quieras que "tarde" más o menos.
      */
     private int calcularTiempoES(ProcesoES p) {
+        String tipo = p.getTipoOperacion();
+
+        // renombrar: costo pequeño
+        if (tipo != null && tipo.startsWith("RENOMBRAR")) {
+            return 2; // 2 ticks
+        }
+
         int bloques = p.getTamanoEnBloques();
         if (bloques <= 0) {
             bloques = 1;
         }
-        return bloques * 2; // por ejemplo, cada bloque son 2 "ticks"
+        return bloques * 2; // cada bloque = 2 ticks
     }
 
-    // ====== TICK: BLOQUEADO -> TERMINADO ======
-
     /**
-     * Se llama periódicamente (por un Timer en la GUI).
-     * Resta 1 al tiempoRestanteES de los bloqueados.
-     * Cuando llega a 0, se ejecuta la operación real en disco
-     * y el proceso pasa a TERMINADO.
+     * Avanza un tick para los BLOQUEADOS.
+     * Cuando tES llega a 0: ejecuta la operación real en disco
+     * y pasa a TERMINADO.
      */
     public void tickBloqueados() {
         try {
@@ -186,11 +282,10 @@ public class GestorProcesoES {
                     p.setTiempoRestanteES(t);
 
                     if (t <= 0) {
-                        // Termina su E/S: ejecutar operación real en disco
+                        // Termina su E/S
                         colaBloqueados.removeAt(i);
                         n--;
 
-                        // Ejecutar CRUD en el sistema de archivos
                         ejecutarOperacionReal(p);
 
                         p.setEstado("terminado");
@@ -208,16 +303,17 @@ public class GestorProcesoES {
         }
     }
 
-    /**
-     * Llama a GestorDisco para que haga CREAR/ELIMINAR/LEER de verdad.
-     */
+    // =========================================================
+    //              EJECUCIÓN REAL EN DISCO
+    // =========================================================
+
     private void ejecutarOperacionReal(ProcesoES p) {
         if (gestorDisco == null || p == null) return;
 
         String tipo = p.getTipoOperacion();
         String rutaCompleta = p.getRutaArchivo();
 
-        // separar ruta en directorio + nombre, igualito a tu GestorDisco
+        // separar ruta en directorio + nombre
         String rutaDirectorio = "/";
         String nombreArchivo = rutaCompleta;
 
@@ -232,43 +328,65 @@ public class GestorProcesoES {
             }
         }
 
-        if (tipo.equals("CREAR")) {
+        if ("CREAR".equals(tipo)) {
             int tam = p.getTamanoEnBloques();
-            gestorDisco.getSistemaArchivos().crearArchivo(rutaDirectorio, nombreArchivo, tam);
-        } else if (tipo.equals("ELIMINAR")) {
-            gestorDisco.getSistemaArchivos().eliminarArchivo(rutaDirectorio, nombreArchivo);
-        } else if (tipo.equals("LEER")) {
-            gestorDisco.getSistemaArchivos().leerArchivo(rutaDirectorio, nombreArchivo);
-        }
-        // si quieres, aquí podrías guardar mensajes en un log para la GUI
-    }
+            gestorDisco.getSistemaArchivos()
+                       .crearArchivo(rutaDirectorio, nombreArchivo, tam);
 
-    // helpers internos
+        } else if ("ELIMINAR".equals(tipo)) {
+            gestorDisco.getSistemaArchivos()
+                       .eliminarArchivo(rutaDirectorio, nombreArchivo);
 
-    /**
-     * Quita un proceso de una cola dada si está ahí (comparando por referencia).
-     * NO usa semáforo, se asume que ya está tomado.
-     */
-    private void quitarDeColaSinLock(Cola<ProcesoES> cola, ProcesoES objetivo) {
-        int n = cola.verTamano();
-        int i = 0;
-        while (i < n) {
-            ProcesoES p = cola.getAt(i);
-            if (p == objetivo) {
-                cola.removeAt(i);
-                n--;
-                continue;
+        } else if ("LEER".equals(tipo)) {
+            gestorDisco.getSistemaArchivos()
+                       .leerArchivo(rutaDirectorio, nombreArchivo);
+
+        } else if ("RENOMBRAR_ARCHIVO".equals(tipo)) {
+            String nuevoNombre = p.getNuevoNombre();
+            if (nuevoNombre != null && !nuevoNombre.isEmpty()) {
+                gestorDisco.getSistemaArchivos()
+                           .renombrarArchivo(rutaDirectorio, nombreArchivo, nuevoNombre);
             }
-            i++;
+
+        } else if ("RENOMBRAR_DIRECTORIO".equals(tipo)) {
+            String nuevoNombre = p.getNuevoNombre();
+            if (nuevoNombre != null && !nuevoNombre.isEmpty()) {
+                gestorDisco.getSistemaArchivos()
+                           .renombrarDirectorio(rutaDirectorio, nombreArchivo, nuevoNombre);
+            }
         }
     }
 
-    // Helpers para JTable
+    // =========================================================
+    //              HELPERS PARA LAS TABLAS (JTable)
+    // =========================================================
+
+    public Object[][] obtenerTablaNuevos() {
+        try {
+            mutexColas.acquire();
+            return construirMatrizDesdeCola(colaNuevos);
+        } catch (InterruptedException e) {
+            return new Object[0][0];
+        } finally {
+            mutexColas.release();
+        }
+    }
 
     public Object[][] obtenerTablaListos() {
         try {
             mutexColas.acquire();
             return construirMatrizDesdeCola(colaListos);
+        } catch (InterruptedException e) {
+            return new Object[0][0];
+        } finally {
+            mutexColas.release();
+        }
+    }
+
+    public Object[][] obtenerTablaEjecucion() {
+        try {
+            mutexColas.acquire();
+            return construirMatrizDesdeCola(colaEjecucion);
         } catch (InterruptedException e) {
             return new Object[0][0];
         } finally {
@@ -298,9 +416,10 @@ public class GestorProcesoES {
         }
     }
 
+    /** Construye filas: {ID, Operación, Ruta, Estado, tES, Pista}. */
     private Object[][] construirMatrizDesdeCola(Cola<ProcesoES> cola) {
         int n = cola.verTamano();
-        Object[][] data = new Object[n][5];
+        Object[][] data = new Object[n][6];
 
         int i = 0;
         while (i < n) {
@@ -311,6 +430,7 @@ public class GestorProcesoES {
                 data[i][2] = p.getRutaArchivo();
                 data[i][3] = p.getEstado();
                 data[i][4] = p.getTiempoRestanteES();
+                data[i][5] = p.getPista();
             }
             i++;
         }

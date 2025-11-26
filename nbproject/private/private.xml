@@ -3,6 +3,7 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/GUI/Interfaz.java</file>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Estructuras/Nodo.java</file>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Estructuras/Cola.java</file>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Estructuras/Lista.java</file>
@@ -12,8 +13,11 @@
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/Directorio.java</file>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/SistemaArchivos.java</file>
             <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/ProcesoES.java</file>
-            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/PruebaPlanificadorFIFO.java</file>
-            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/PlanificadorDiscoFIFO.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/Planificador.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Componentes/GestorDisco.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/Procesos/GestorProcesoES.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/proyecto/pkg2/so/Proyecto2SO.java</file>
+            <file>file:/Users/luismarianolovera/Desktop/Proyecto-2-SO/src/GUI/VentanaPrincipal.java</file>
         </group>
     </open-files>
 </project-private>

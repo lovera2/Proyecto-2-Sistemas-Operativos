@@ -14,8 +14,8 @@ public class GestorDisco {
 
     private SistemaArchivos sistemaArchivos;
 
-    public GestorDisco(int cantidadBloquesDisco) {
-        this.sistemaArchivos = new SistemaArchivos(cantidadBloquesDisco);
+    public GestorDisco(SistemaArchivos sistemaArchivos) {
+        this.sistemaArchivos = sistemaArchivos;
     }
 
     public SistemaArchivos getSistemaArchivos() {

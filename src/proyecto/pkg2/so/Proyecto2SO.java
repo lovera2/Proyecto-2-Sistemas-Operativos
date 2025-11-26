@@ -4,6 +4,8 @@
  */
 package proyecto.pkg2.so;
 
+import GUI.VentanaPrincipal;
+
 /**
  *
  * @author luismarianolovera
@@ -15,6 +17,9 @@ public class Proyecto2SO {
      */
     public static void main(String[] args) {
         // TODO code application logic here
+        java.awt.EventQueue.invokeLater(() -> {
+            new VentanaPrincipal().setVisible(true);
+        });
     }
     
 }
