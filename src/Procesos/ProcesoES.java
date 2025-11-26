@@ -55,19 +55,20 @@ public class ProcesoES {
 
     public void setTiempoRestanteES(int tiempoRestanteES) { this.tiempoRestanteES = tiempoRestanteES; }
 
-    public String getNuevoNombre() {
-        return nuevoNombre;
+    public String getNuevoNombre() { return nuevoNombre; }
+
+    public void setNuevoNombre(String nuevoNombre) { this.nuevoNombre = nuevoNombre; }
+
+    public boolean isEsDirectorio() { return esDirectorio; }
+
+    public void setEsDirectorio(boolean esDirectorio) { this.esDirectorio = esDirectorio; }
+
+    // Alias para usar "pista" en las tablas
+    public int getPista() {
+        return posicionCabezal;
     }
 
-    public void setNuevoNombre(String nuevoNombre) {
-        this.nuevoNombre = nuevoNombre;
-    }
-
-    public boolean isEsDirectorio() {
-        return esDirectorio;
-    }
-
-    public void setEsDirectorio(boolean esDirectorio) {
-        this.esDirectorio = esDirectorio;
+    public void setPista(int pista) {
+        this.posicionCabezal = pista;
     }
 }

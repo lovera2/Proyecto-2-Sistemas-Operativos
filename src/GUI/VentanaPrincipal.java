@@ -69,6 +69,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         refrescarArbol();
         refrescarDiscoVisual();
         refrescarTablaAsignacion();
+        configurarTipoObjeto();
     }
 
     // ================== HELPERS DE MENSAJES ==================
@@ -168,6 +169,30 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             @Override public boolean isCellEditable(int r, int c) { return false; }
         };
     tablaAsignacion.setModel(modeloAsignacion);
+    
+        // Render para que la primera columna muestre un cuadrito de color
+        tablaAsignacion.getColumnModel().getColumn(0)
+            .setCellRenderer(new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+        public java.awt.Component getTableCellRendererComponent(
+            javax.swing.JTable table, Object value,
+            boolean isSelected, boolean hasFocus,
+            int row, int column) {
+
+        // texto vacío, solo el fondo
+        java.awt.Component c = super.getTableCellRendererComponent(
+                table, "", isSelected, hasFocus, row, column);
+
+        if (value instanceof java.awt.Color) {
+            c.setBackground((java.awt.Color) value);
+        } else {
+            c.setBackground(java.awt.Color.LIGHT_GRAY);
+        }
+
+        setOpaque(true);
+        return c;
+        }
+    });
 
     // ================== MODELO COMÚN PARA TODAS LAS COLAS DE PROCESOS ==================
     DefaultTableModel modeloNuevos =
@@ -409,7 +434,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     }
 
     private void refrescarProcesosYDisco() {
-        actualizarTablaProcesos();
+        actualizarTablasProcesos();
         refrescarDiscoVisual();
     }
     
@@ -420,12 +445,27 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         gestorProcesoES.despacharSiguiente();   // LISTOS -> EJECUCIÓN
 
     // luego refrescas TODAS las tablas:
-        refrescarTablasProcesos();              // nuevos, listos, ejec, bloq, term
+        actualizarTablasProcesos();             // nuevos, listos, ejec, bloq, term
         refrescarDiscoVisual();
         refrescarTablaAsignacion();
-        refrescarArbol();
+        //refrescarArbol();
     }
-}
+
+    // Habilita / deshabilita el tamaño según el tipo seleccionado
+    private void configurarTipoObjeto() {
+        // estado inicial al abrir la ventana
+        actualizarHabilitarTamano();
+
+        comboTipoObjeto.addActionListener(e -> actualizarHabilitarTamano());
+    }
+
+    private void actualizarHabilitarTamano() {
+        String tipo = (String) comboTipoObjeto.getSelectedItem();
+        boolean esArchivo = "Archivo".equals(tipo);
+
+        spinTamanoBloques.setEnabled(esArchivo);
+        jLabel6.setEnabled(esArchivo); // etiqueta "Tamaño (cant. de bloques):"
+    }
 
     private void comboPoliticaActionPerformed(java.awt.event.ActionEvent evt) {
         String politica = (String) comboPolitica.getSelectedItem();
@@ -1380,7 +1420,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         }
 
         // actualizar vista de procesos y estructuras
-        actualizarTablaProcesos();
+        actualizarTablasProcesos();
         refrescarArbol();
         refrescarTablaAsignacion();
         refrescarProcesosYDisco();                 
@@ -1406,7 +1446,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         refrescarArbol();
         refrescarTablaAsignacion();
         inicializarDiscoVisual();
-        actualizarTablaProcesos();
+        actualizarTablasProcesos();
         txtLogSistema.setText("");
         txtLogSistema.append("Sistema reiniciado.\n");
     }//GEN-LAST:event_btnReiniciarActionPerformed
@@ -1422,7 +1462,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         gestorProcesoES.crearProcesoLeer(rutaArchivo, pista);
         logSistema("Se creó proceso LEER para " + rutaArchivo + "\n");
 
-        actualizarTablaProcesos();
+        actualizarTablasProcesos();
     }//GEN-LAST:event_btnLeerSeleccionActionPerformed
 
     private void btnRenombrarSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRenombrarSeleccionActionPerformed
@@ -1459,7 +1499,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
             mostrarMensajeUsuario("Nada seleccionado para renombrar.");
             return;
         }
-        actualizarTablaProcesos();
+        actualizarTablasProcesos();
     }//GEN-LAST:event_btnRenombrarSeleccionActionPerformed
 
     /**
